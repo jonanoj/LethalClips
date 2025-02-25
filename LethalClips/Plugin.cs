@@ -19,6 +19,9 @@ public class Plugin : BaseUnityPlugin {
 
         Harmony harmony = new(GUID);
         harmony.PatchAll();
+        foreach(var item in harmony.GetPatchedMethods()) {
+            Log.LogInfo($"Patched method {item}.");
+        }
         Log.LogInfo($"Successfully loaded {NAME} ({GUID}) v{VERSION}!");
     }
 }
