@@ -28,7 +28,8 @@ enum ExtendedCauseOfDeath {
     Inertia,
     Snipped, // this and above are vanilla
     EyelessDog, // this and below are custom
-    EarthLeviathan
+    EarthLeviathan,
+    ForestKeeper
 }
 
 internal class Death {
