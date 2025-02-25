@@ -9,7 +9,7 @@ namespace LethalClips;
 public class Plugin : BaseUnityPlugin {
     const string GUID = "com.lalabuff.lethal.lethalclips";
     const string NAME = "LethalClips";
-    const string VERSION = "0.0.1b";
+    const string VERSION = "0.0.1";
 
     internal static ManualLogSource Log;
 
