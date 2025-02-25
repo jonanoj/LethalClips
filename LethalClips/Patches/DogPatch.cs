@@ -12,6 +12,7 @@ internal class DogPatch {
     ) {
         var player = StartOfRound.Instance.allPlayerScripts[playerId];
         var death = State<Death>.Of(player);
-        death.cause = ExtendedCauseOfDeath.EyelessDog;
+        death.cause = TranslatedCauseOfDeath.Mauled;
+        death.source = "Eyeless Dog";
     }
 }

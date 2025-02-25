@@ -12,6 +12,7 @@ internal class WormPatch {
         PlayerControllerB playerScript
     ) {
         var death = State<Death>.Of(playerScript);
-        death.cause = ExtendedCauseOfDeath.EarthLeviathan;
+        death.cause = TranslatedCauseOfDeath.Devoured;
+        death.source = "Earth Leviathan";
     }
 }

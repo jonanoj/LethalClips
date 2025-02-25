@@ -8,59 +8,40 @@ namespace LethalClips.Patches;
 using P = PlayerControllerB;
 
 
-enum ExtendedCauseOfDeath {
-    Unknown,
-    Bludgeoning,
-    Gravity,
-    Blast,
-    Strangulation,
-    Suffocation,
-    Mauling,
-    Gunshots,
-    Crushing,
-    Drowning,
-    Abandoned,
-    Electrocution,
-    Kicking,
-    Burning,
-    Stabbing,
-    Fan,
-    Inertia,
-    Snipped, // this and above are vanilla
-    EyelessDog, // this and below are custom
-    EarthLeviathan,
-    ForestKeeper
+enum TranslatedCauseOfDeath {
+    Killed, // Unknown
+    Bludgeoned, // Bludgeoning
+    SPLAT, // Gravity
+    Blast, // Blast
+    Strangled, // Strangulation
+    Suffocated, // Suffocation
+    Mauled, // Mauling
+    Shot, // Gunshots
+    Crushed, // Crushing
+    Drowned, // Drowning
+    Abandoned, // Abandoned
+    Electrocuted, // Electrocution
+    Kicked, // Kicking
+    Burned, // Burning
+    Stabbed, // Stabbing
+    Sliced, // Fan
+    Flattened, // Inertia
+    Snipped, // Snipped
+    Devoured
 }
 
 internal class Death {
-    internal ExtendedCauseOfDeath cause;
+    internal TranslatedCauseOfDeath cause;
 
-    internal string Cause => Enum.GetName(typeof(ExtendedCauseOfDeath), cause);
+    internal string source;
 
     internal string Message {
         get {
-            switch(cause) {
-                case ExtendedCauseOfDeath.Unknown:
-                    return "Unknown cause of death.";
-                case ExtendedCauseOfDeath.Drowning:
-                    return "Drowned.";
-                case ExtendedCauseOfDeath.Abandoned:
-                    return "Left behind.";
-                case ExtendedCauseOfDeath.Snipped:
-                    return "Snipped.";
+            string message = Enum.GetName(typeof(TranslatedCauseOfDeath), cause) ?? "Killed";
+            if(!string.IsNullOrEmpty(source)) {
+                message += " by " + source;
             }
-
-            string pascal = Cause ?? "divine intervention";
-
-            string spaced = "";
-            foreach(char c in pascal) {
-                if(char.IsUpper(c)) {
-                    spaced += " ";
-                }
-                spaced += c;
-            }
-
-            return $"Killed by {spaced.Trim()}.";
+            return message;
         }
     }
 }
@@ -82,11 +63,11 @@ internal class KillPatch {
     ) {
         if(__state) { // check whether player actually died
             var death = State<Death>.Of(__instance);
-            if(death.cause == ExtendedCauseOfDeath.Unknown) {
-                death.cause = (ExtendedCauseOfDeath)causeOfDeath;
+            if(death.cause == TranslatedCauseOfDeath.Killed) {
+                death.cause = (TranslatedCauseOfDeath)causeOfDeath;
             }
 
-            Plugin.Log.LogInfo($"Player died! Cause of death: {death.Cause}");
+            Plugin.Log.LogInfo($"Player died! Cause of death: {death.Message}");
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
                 death.Message,
                 "git gud lol",

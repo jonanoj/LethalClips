@@ -13,7 +13,8 @@ internal class GiantPatch_EatPlayerAnimation {
         PlayerControllerB playerBeingEaten
     ) {
         var death = State<Death>.Of(playerBeingEaten);
-        death.cause = ExtendedCauseOfDeath.ForestKeeper;
+        death.cause = TranslatedCauseOfDeath.Devoured;
+        death.source = "Forest Keeper";
     }
 }
 
@@ -35,7 +36,8 @@ internal class GiantPatch_AnimationEventA {
         for(int i = 0; i < array.Length; i++) {
             PlayerControllerB player = array[i].transform.GetComponent<PlayerControllerB>();
             var death = State<Death>.Of(player);
-            death.cause = ExtendedCauseOfDeath.Crushing;
+            death.cause = TranslatedCauseOfDeath.Crushed;
+            death.source = "Forest Keeper";
         }
     }
 }
