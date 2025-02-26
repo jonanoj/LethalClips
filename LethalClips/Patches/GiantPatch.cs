@@ -10,11 +10,26 @@ using P = ForestGiantAI;
 [HarmonyPatch(typeof(P), "EatPlayerAnimation")]
 internal class GiantPatch_EatPlayerAnimation {
     private static void Prefix(
-        PlayerControllerB playerBeingEaten
+        PlayerControllerB playerBeingEaten,
+        ref Death __state
     ) {
         var death = State<Death>.Of(playerBeingEaten);
+        __state = new() {
+            cause = death.cause,
+            source = death.source
+        };
         death.cause = TranslatedCauseOfDeath.Devoured;
         death.source = "Forest Keeper";
+    }
+
+    private static void Postfix(
+        PlayerControllerB playerBeingEaten,
+        Death __state
+    ) {
+        // restore the previous cause of death, in case no kill happened
+        var death = State<Death>.Of(playerBeingEaten);
+        death.cause = __state.cause;
+        death.source = __state.source;
     }
 }
 
@@ -38,6 +53,7 @@ internal class GiantPatch_AnimationEventA {
             var death = State<Death>.Of(player);
             death.cause = TranslatedCauseOfDeath.Crushed;
             death.source = "Forest Keeper";
+            // TODO: undo this?
         }
     }
 }
