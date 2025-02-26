@@ -22,12 +22,18 @@ enum TranslatedCauseOfDeath {
     Abandoned, // Abandoned
     Electrocuted, // Electrocution
     Kicked, // Kicking
-    Burned, // Burning
+    Incinerated, // Burning
     Stabbed, // Stabbing
     Sliced, // Fan
-    Flattened, // Inertia
+    Crashed, // Inertia
     Snipped, // Snipped
-    Devoured
+    Devoured,
+    Springed,
+    Died,
+    Disintegrated,
+    Infected,
+    Exploded,
+    Embarrassing
 }
 
 internal class Death {
@@ -48,11 +54,11 @@ internal class Death {
 
 [HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
 internal class KillPatch {
-
     private static void Prefix(
         P __instance,
         ref bool __state
     ) {
+        // the body of the method changes these values, so cache them now
         __state = __instance.IsOwner && !__instance.isPlayerDead && __instance.AllowPlayerDeath();
     }
 
@@ -61,7 +67,8 @@ internal class KillPatch {
         bool __state,
         CauseOfDeath causeOfDeath
     ) {
-        if(__state) { // check whether player actually died
+        // use stored value to determine if we actually need to do anything
+        if(__state) {
             var death = State<Death>.Of(__instance);
             if(death.cause == TranslatedCauseOfDeath.Killed) {
                 death.cause = (TranslatedCauseOfDeath)causeOfDeath;
