@@ -22,53 +22,21 @@ internal class OldPatch_TorchPlayerAnimation {
 
 [HarmonyPatch(typeof(P), "Stomp")]
 internal class OldPatch_Stomp {
-    private static void Prefix(
-        ref Death __state
-     ) {
+    private static void Prefix() {
         var player = GameNetworkManager.Instance.localPlayerController;
         var death = State<Death>.Of(player);
-        __state = new() {
-            cause = death.cause,
-            source = death.source
-        };
         death.cause = TranslatedCauseOfDeath.Crushed;
         death.source = "Old Bird";
-    }
-
-    private static void Postfix(
-        Death __state
-    ) {
-        // restore the previous cause of death, in case no kill happened
-        var player = GameNetworkManager.Instance.localPlayerController;
-        var death = State<Death>.Of(player);
-        death.cause = __state.cause;
-        death.source = __state.source;
     }
 }
 
 
 [HarmonyPatch(typeof(P), nameof(P.SetExplosion))]
 internal class OldPatch_SetExplosion {
-    private static void Prefix(
-        ref Death __state
-     ) {
+    private static void Prefix() {
         var player = GameNetworkManager.Instance.localPlayerController;
         var death = State<Death>.Of(player);
-        __state = new() {
-            cause = death.cause,
-            source = death.source
-        };
         death.cause = TranslatedCauseOfDeath.Exploded;
         death.source = "Old Bird";
-    }
-
-    private static void Postfix(
-        Death __state
-    ) {
-        // restore the previous cause of death, in case no kill happened
-        var player = GameNetworkManager.Instance.localPlayerController;
-        var death = State<Death>.Of(player);
-        death.cause = __state.cause;
-        death.source = __state.source;
     }
 }

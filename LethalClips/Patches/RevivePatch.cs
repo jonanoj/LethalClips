@@ -7,7 +7,6 @@ using P = StartOfRound;
 
 [HarmonyPatch(typeof(P), nameof(P.ReviveDeadPlayers))]
 internal class RevivePatch {
-
     private static void Postfix(
         P __instance
     ) {
