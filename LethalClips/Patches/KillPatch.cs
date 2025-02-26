@@ -52,6 +52,7 @@ internal class Death {
     }
 }
 
+
 [HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
 internal class KillPatch {
     private static void Prefix(
