@@ -11,6 +11,28 @@ internal class Player {
     internal PlayerControllerB player;
 }
 
+[HarmonyPatch(typeof(P), "OnTriggerExit")]
+internal class LandminePatch_OnTriggerExit {
+    private static void Prefix(
+        P __instance,
+        Collider other,
+        bool ___mineActivated
+    ) {
+        if(__instance.hasExploded || !___mineActivated) {
+            return;
+        }
+
+        var t = other.transform;
+        while(t) {
+            if(t.TryGetComponent<PlayerControllerB>(out var player)) {
+                State<Player>.Of(__instance).player = player;
+                break;
+            }
+            t = t.parent;
+        }
+    }
+}   
+
 
 [HarmonyPatch(typeof(P), nameof(P.Detonate))]
 internal class LandminePatch_Detonate {
