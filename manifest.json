@@ -1,10 +1,10 @@
 {
     "name": "LethalClips",
     "description": "Marks significant moments on your timeline when using Steam's built-in game recording feature so that you can easily return to and clip them.",
-    "version_number": "0.0.1",
+    "version_number": "0.0.2",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100",
         "96_LB-SteamApiUpgrade-0.0.1"
     ],
-    "website_url": ""
+    "website_url": "https://github.com/96-LB/LethalClips"
 }
