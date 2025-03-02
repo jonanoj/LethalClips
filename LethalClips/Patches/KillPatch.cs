@@ -68,7 +68,7 @@ internal static class KillPatch {
         }
         KillPatch.cause = cause;
         KillPatch.source = source;
-        if(timeout > 0) {
+        if(timeout >= 0) {
             time = Time.time + timeout;
         } else {
             time = -1; // nothing else can modify cause of death anymore
@@ -89,7 +89,7 @@ internal static class KillPatch {
     ) {
         // use stored value to determine if we actually need to do anything
         if(__state) {
-            if(time < 0 || Time.time > time || cause == TranslatedCauseOfDeath.Killed) {
+            if(0 <= time && time < Time.time) {
                 cause = (TranslatedCauseOfDeath)causeOfDeath;
                 source = "";
             }
