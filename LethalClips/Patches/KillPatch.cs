@@ -2,6 +2,7 @@
 using HarmonyLib;
 using GameNetcodeStuff;
 using Steamworks;
+using UnityEngine;
 
 namespace LethalClips.Patches;
 
@@ -12,7 +13,7 @@ enum TranslatedCauseOfDeath {
     Killed, // Unknown
     Bludgeoned, // Bludgeoning
     SPLAT, // Gravity
-    Blast, // Blast
+    Exploded, // Blast
     Strangled, // Strangulation
     Suffocated, // Suffocation
     Mauled, // Mauling
@@ -32,16 +33,18 @@ enum TranslatedCauseOfDeath {
     Died,
     Disintegrated,
     Infected,
-    Exploded,
     Embarrassing
 }
 
-internal class Death {
-    internal TranslatedCauseOfDeath cause;
 
-    internal string source;
+[HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
+internal static class KillPatch {
 
-    internal string Message {
+    private static TranslatedCauseOfDeath cause;
+    private static string source;
+    private static float time;
+
+    internal static string Message {
         get {
             string message = Enum.GetName(typeof(TranslatedCauseOfDeath), cause) ?? "Killed";
             if(!string.IsNullOrEmpty(source)) {
@@ -50,11 +53,28 @@ internal class Death {
             return message;
         }
     }
-}
 
+    internal static P Player => GameNetworkManager.Instance.localPlayerController;
 
-[HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
-internal class KillPatch {
+    internal static void Damage(TranslatedCauseOfDeath cause, string source, float damage) {
+        if(Player.health <= damage && (damage > 50 || Player.criticallyInjured)) {
+            Kill(cause, source);
+        }
+    }
+
+    internal static void Kill(TranslatedCauseOfDeath cause, string source, float timeout = 0.1f) {
+        if(time < 0) {
+            return; // something has already hard-claimed cause of death
+        }
+        KillPatch.cause = cause;
+        KillPatch.source = source;
+        if(timeout >= 0) {
+            time = Time.time + timeout;
+        } else {
+            time = -1; // nothing else can modify cause of death anymore
+        }
+    }
+
     private static void Prefix(
         P __instance,
         ref bool __state
@@ -64,27 +84,28 @@ internal class KillPatch {
     }
 
     private static void Postfix(
-        P __instance,
         bool __state,
         CauseOfDeath causeOfDeath
     ) {
         // use stored value to determine if we actually need to do anything
         if(__state) {
-            var death = State<Death>.Of(__instance);
-            if(death.cause == TranslatedCauseOfDeath.Killed) {
-                death.cause = (TranslatedCauseOfDeath)causeOfDeath;
+            if(0 <= time && time < Time.time) {
+                cause = (TranslatedCauseOfDeath)causeOfDeath;
+                source = "";
             }
 
-            Plugin.Log.LogInfo($"Player died! Cause of death: {death.Message}");
+            Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                death.Message,
-                "git gud lol",
+                Message,
+                "git gud lol", // TODO: better description
                 "steam_death",
                 0,
                 0,
                 TimelineEventClipPriority.Standard
             );
             Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
+
+            time = 0; // reset cause of death
         }
     }
 }

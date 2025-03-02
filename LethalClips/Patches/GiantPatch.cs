@@ -7,20 +7,8 @@ namespace LethalClips.Patches;
 using P = ForestGiantAI;
 
 
-[HarmonyPatch(typeof(P), "EatPlayerAnimation")]
-internal class GiantPatch_EatPlayerAnimation {
-    private static void Prefix(
-        PlayerControllerB playerBeingEaten
-    ) {
-        var death = State<Death>.Of(playerBeingEaten);
-        death.cause = TranslatedCauseOfDeath.Devoured;
-        death.source = "Forest Keeper";
-    }
-}
-
-
 [HarmonyPatch(typeof(P), nameof(P.AnimationEventA))]
-internal class GiantPatch_AnimationEventA {
+internal class GiantPatch {
     private static void Prefix(
         P __instance
     ) {
@@ -35,9 +23,9 @@ internal class GiantPatch_AnimationEventA {
         );
         for(int i = 0; i < array.Length; i++) {
             PlayerControllerB player = array[i].transform.GetComponent<PlayerControllerB>();
-            var death = State<Death>.Of(player);
-            death.cause = TranslatedCauseOfDeath.Crushed;
-            death.source = "Forest Keeper";
+            if(player == KillPatch.Player) {
+                KillPatch.Kill(TranslatedCauseOfDeath.Crushed, "Forest Keeper");
+            }
         }
     }
 }
