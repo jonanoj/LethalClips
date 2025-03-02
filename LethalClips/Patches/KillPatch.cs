@@ -90,7 +90,7 @@ internal static class KillPatch {
     ) {
         // use stored value to determine if we actually need to do anything
         if(__state) {
-            if(Time.time > time || cause == TranslatedCauseOfDeath.Killed) {
+            if(time < 0 || Time.time > time || cause == TranslatedCauseOfDeath.Killed) {
                 cause = (TranslatedCauseOfDeath)causeOfDeath;
                 source = "";
             }
