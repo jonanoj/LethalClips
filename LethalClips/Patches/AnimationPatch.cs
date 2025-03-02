@@ -22,10 +22,10 @@ internal class AnimationPatch {
 
     [HarmonyPatch(typeof(ForestGiantAI), "EatPlayerAnimation")]
     [HarmonyPrefix]
-    private static void Giant() {
+    private static void ForestKeeper() {
         // it's pretty common to escape the animation, so don't hard-claim death
         // TODO: try to hook into these animations a little more closely to claim death only when about to die
-        KillPatch.Kill(TranslatedCauseOfDeath.Devoured, "Giant", 6);
+        KillPatch.Kill(TranslatedCauseOfDeath.Devoured, "ForestKeeper", 6);
     }
 
     [HarmonyPatch(typeof(JesterAI), "killPlayerAnimation")]
