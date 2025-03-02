@@ -57,10 +57,23 @@ internal static class KillPatch {
 
     internal static P Player => GameNetworkManager.Instance.localPlayerController;
 
+    internal static void Damage(TranslatedCauseOfDeath cause, string source, float damage) {
+        if(Player.health <= damage && (damage > 50 || Player.criticallyInjured)) {
+            Kill(cause, source);
+        }
+    }
+
     internal static void Kill(TranslatedCauseOfDeath cause, string source, float timeout = 0.1f) {
+        if(time < 0) {
+            return; // something has already hard-claimed cause of death
+        }
         KillPatch.cause = cause;
         KillPatch.source = source;
-        time = Time.time + timeout;
+        if(timeout > 0) {
+            time = Time.time + timeout;
+        } else {
+            time = -1; // nothing else can modify cause of death anymore
+        }
     }
 
     private static void Prefix(
@@ -72,7 +85,6 @@ internal static class KillPatch {
     }
 
     private static void Postfix(
-        P __instance,
         bool __state,
         CauseOfDeath causeOfDeath
     ) {
@@ -86,7 +98,7 @@ internal static class KillPatch {
             Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
                 Message,
-                "git gud lol",
+                "git gud lol", // TODO: better description
                 "steam_death",
                 0,
                 0,

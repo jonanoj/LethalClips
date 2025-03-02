@@ -1,5 +1,4 @@
-﻿using GameNetcodeStuff;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
 
 namespace LethalClips.Patches;
@@ -8,12 +7,12 @@ using P = EnemyAI;
 
 
 [HarmonyPatch(typeof(P), nameof(P.OnCollideWithPlayer))]
-internal class EnemyPatch {
+internal class DamagePatch {
     private static void Prefix(
         P __instance,
         Collider other
     ) {
-        const int KILL = int.MaxValue;
+        const int KILL = -1;
         var overrideIsInsideFactoryCheck = __instance switch {
             DressGirlAI => true,
             _ => false
@@ -44,8 +43,10 @@ internal class EnemyPatch {
         };
 
         // TODO: get enemy internal timers to check if they can actually damage the player
-        if(KillPatch.Player.health <= damage && (damage > 50 || KillPatch.Player.criticallyInjured)) {
+        if(damage == KILL) {
             KillPatch.Kill(cause, source);
+        } else {
+            KillPatch.Damage(cause, source, damage);
         }
     }
 }

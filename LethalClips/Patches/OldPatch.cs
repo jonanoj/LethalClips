@@ -1,5 +1,4 @@
-﻿using GameNetcodeStuff;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
 
 namespace LethalClips.Patches;
@@ -7,36 +6,28 @@ namespace LethalClips.Patches;
 using P = RadMechAI;
 
 
-[HarmonyPatch(typeof(P), "TorchPlayerAnimation")]
-internal class OldPatch_TorchPlayerAnimation {
-    private static void Prefix(
-        P __instance
+[HarmonyPatch(typeof(P))]
+internal class OldPatch {
+    [HarmonyPatch("Stomp")]
+    [HarmonyPrefix]
+    private static void Stomp(
+        Transform stompTransform,
+        float radius
     ) {
-        var player = __instance.inSpecialAnimationWithPlayer;
-        var death = State<Death>.Of(player);
-        death.cause = TranslatedCauseOfDeath.Incinerated;
-        death.source = "Old Bird";
+        // check if the player is within the stomp radius
+        double num = Vector3.Distance(KillPatch.Player.transform.position, stompTransform.position);
+        if(num < radius) {
+            if(num < radius * 0.175) {
+                KillPatch.Damage(TranslatedCauseOfDeath.Crushed, "Old Bird", 70);
+            } else if(num < radius * 0.5f) {
+                KillPatch.Damage(TranslatedCauseOfDeath.Crushed, "Old Bird", 30);
+            }
+        }
     }
-}
 
-
-[HarmonyPatch(typeof(P), "Stomp")]
-internal class OldPatch_Stomp {
-    private static void Prefix() {
-        var player = GameNetworkManager.Instance.localPlayerController;
-        var death = State<Death>.Of(player);
-        death.cause = TranslatedCauseOfDeath.Crushed;
-        death.source = "Old Bird";
-    }
-}
-
-
-[HarmonyPatch(typeof(P), nameof(P.SetExplosion))]
-internal class OldPatch_SetExplosion {
-    private static void Prefix() {
-        var player = GameNetworkManager.Instance.localPlayerController;
-        var death = State<Death>.Of(player);
-        death.cause = TranslatedCauseOfDeath.Exploded;
-        death.source = "Old Bird";
+    [HarmonyPatch(nameof(P.SetExplosion))]
+    [HarmonyPrefix]
+    private static void SetExplosion(Vector3 explosionPosition, Vector3 forwardRotation) {
+        LandminePatch_Detonate.SpawnExplosion(explosionPosition - forwardRotation * 0.1f, 1f, 7f, 30, "Old Bird");
     }
 }

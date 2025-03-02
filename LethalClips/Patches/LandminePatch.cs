@@ -38,14 +38,9 @@ internal class LandminePatch_OnTriggerExit {
 
 [HarmonyPatch(typeof(P), nameof(P.Detonate))]
 internal class LandminePatch_Detonate {
-    private static void Prefix(
-        P __instance
-    ) {
+
+    internal static void SpawnExplosion(Vector3 explosionPosition, float killRange, float damageRange, int nonLethalDamage, string source) {
         // simulate an explosion to see if we need to trigger a kill
-        var explosionPosition = __instance.transform.position + Vector3.up;
-        var killRange = 5.7f;
-        var damageRange = 6f;
-        var nonLethalDamage = 50;
         Collider[] array = Physics.OverlapSphere(explosionPosition, damageRange, 2621448, QueryTriggerInteraction.Collide);
         for(int i = 0; i < array.Length; i++) {
             var obj = array[i].gameObject;
@@ -55,20 +50,25 @@ internal class LandminePatch_Detonate {
             }
 
             if(obj.layer == 3 && obj.GetComponent<PlayerControllerB>() == KillPatch.Player) {
-                if(dist < killRange || dist < damageRange && KillPatch.Player.health <= nonLethalDamage) {
-                    // set the death cause
-                    Kill(__instance);
-                    break;
+                // set the cause of death
+                if(dist < killRange) {
+                    KillPatch.Kill(TranslatedCauseOfDeath.Exploded, source);
+                } else if(dist < damageRange) {
+                    KillPatch.Damage(TranslatedCauseOfDeath.Exploded, source, nonLethalDamage);
                 }
+                break;
             }
         }
     }
+
+    private static void Prefix(
+        P __instance
+    ) {
+        SpawnExplosion(__instance.transform.position + Vector3.up, 5.7f, 6f, 50, Blame(__instance));
+    }
     
-    private static void Kill(P __instance) {
+    private static string Blame(P __instance) {
         var blame = State<Player>.Of(__instance).player;
-        KillPatch.Kill(
-            TranslatedCauseOfDeath.Exploded,
-            blame == null || blame == KillPatch.Player ? "Landmine" : blame.playerUsername
-        );
+        return blame == null || blame == KillPatch.Player ? "Landmine" : blame.playerUsername;
     }
 }
