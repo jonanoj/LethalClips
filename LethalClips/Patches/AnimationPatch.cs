@@ -4,6 +4,7 @@ using HarmonyLib;
 namespace LethalClips.Patches;
 
 
+[HarmonyPatch()]
 internal class AnimationPatch {
 
     [HarmonyPatch(typeof(FlowermanAI), "killAnimation")]

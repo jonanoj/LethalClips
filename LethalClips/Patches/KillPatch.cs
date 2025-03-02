@@ -13,7 +13,7 @@ enum TranslatedCauseOfDeath {
     Killed, // Unknown
     Bludgeoned, // Bludgeoning
     SPLAT, // Gravity
-    Blast, // Blast
+    Exploded, // Blast
     Strangled, // Strangulation
     Suffocated, // Suffocation
     Mauled, // Mauling
@@ -33,7 +33,6 @@ enum TranslatedCauseOfDeath {
     Died,
     Disintegrated,
     Infected,
-    Exploded,
     Embarrassing
 }
 
