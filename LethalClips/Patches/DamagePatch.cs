@@ -13,10 +13,7 @@ internal class DamagePatch {
         Collider other
     ) {
         const int KILL = -1;
-        var overrideIsInsideFactoryCheck = __instance switch {
-            DressGirlAI => true,
-            _ => false
-        };
+        var overrideIsInsideFactoryCheck = __instance is DressGirlAI;
 
         if(!__instance.MeetsStandardPlayerCollisionConditions(other, false, overrideIsInsideFactoryCheck)) {
             return;

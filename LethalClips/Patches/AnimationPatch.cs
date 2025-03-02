@@ -1,5 +1,4 @@
-﻿using GameNetcodeStuff;
-using HarmonyLib;
+﻿using HarmonyLib;
 
 namespace LethalClips.Patches;
 
