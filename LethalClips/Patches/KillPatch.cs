@@ -2,6 +2,7 @@
 using HarmonyLib;
 using GameNetcodeStuff;
 using Steamworks;
+using UnityEngine;
 
 namespace LethalClips.Patches;
 
@@ -36,12 +37,15 @@ enum TranslatedCauseOfDeath {
     Embarrassing
 }
 
-internal class Death {
-    internal TranslatedCauseOfDeath cause;
 
-    internal string source;
+[HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
+internal static class KillPatch {
 
-    internal string Message {
+    private static TranslatedCauseOfDeath cause;
+    private static string source;
+    private static float time;
+
+    internal static string Message {
         get {
             string message = Enum.GetName(typeof(TranslatedCauseOfDeath), cause) ?? "Killed";
             if(!string.IsNullOrEmpty(source)) {
@@ -50,11 +54,15 @@ internal class Death {
             return message;
         }
     }
-}
 
+    internal static P Player => GameNetworkManager.Instance.localPlayerController;
 
-[HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
-internal class KillPatch {
+    internal static void Kill(TranslatedCauseOfDeath cause, string source, float timeout = 0.1f) {
+        KillPatch.cause = cause;
+        KillPatch.source = source;
+        time = Time.time + timeout;
+    }
+
     private static void Prefix(
         P __instance,
         ref bool __state
@@ -70,14 +78,14 @@ internal class KillPatch {
     ) {
         // use stored value to determine if we actually need to do anything
         if(__state) {
-            var death = State<Death>.Of(__instance);
-            if(death.cause == TranslatedCauseOfDeath.Killed) {
-                death.cause = (TranslatedCauseOfDeath)causeOfDeath;
+            if(Time.time > time || cause == TranslatedCauseOfDeath.Killed) {
+                cause = (TranslatedCauseOfDeath)causeOfDeath;
+                source = "";
             }
 
-            Plugin.Log.LogInfo($"Player died! Cause of death: {death.Message}");
+            Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                death.Message,
+                Message,
                 "git gud lol",
                 "steam_death",
                 0,
@@ -85,6 +93,8 @@ internal class KillPatch {
                 TimelineEventClipPriority.Standard
             );
             Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
+
+            time = 0; // reset cause of death
         }
     }
 }
