@@ -37,7 +37,7 @@ internal class AnimationPatch {
     [HarmonyPatch(typeof(MaskedPlayerEnemy), "killAnimation")]
     [HarmonyPrefix]
     private static void Masked(MaskedPlayerEnemy __instance) {
-        KillPatch.Kill(TranslatedCauseOfDeath.Infected, __instance. "Masked", 5);
+        KillPatch.Kill(TranslatedCauseOfDeath.Infected, __instance.mimickingPlayer?.playerUsername ?? "Masked", 5);
     }
 
     [HarmonyPatch(typeof(RadMechAI), "TorchPlayerAnimation")]
