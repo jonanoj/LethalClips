@@ -6,6 +6,7 @@ namespace LethalClips;
 
 
 [BepInPlugin(GUID, NAME, VERSION)]
+[BepInDependency("com.lalabuff.lethal.steamapiupgrade")]
 public class Plugin : BaseUnityPlugin {
     const string GUID = "com.lalabuff.lethal.lethalclips";
     const string NAME = "LethalClips";
