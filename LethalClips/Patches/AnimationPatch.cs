@@ -36,14 +36,13 @@ internal class AnimationPatch {
 
     [HarmonyPatch(typeof(MaskedPlayerEnemy), "killAnimation")]
     [HarmonyPrefix]
-    private static void Masked() {
-        // it's pretty common to escape the animation, so don't hard-claim death
-        KillPatch.Kill(TranslatedCauseOfDeath.Infected, "Masked", 5);
+    private static void Masked(MaskedPlayerEnemy __instance) {
+        KillPatch.Kill(TranslatedCauseOfDeath.Infected, __instance. "Masked", 5);
     }
 
     [HarmonyPatch(typeof(RadMechAI), "TorchPlayerAnimation")]
     [HarmonyPrefix]
     private static void OldBird() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Incinerated, "Old Bird", -1);
+        KillPatch.Kill(TranslatedCauseOfDeath.Incinerated, "Old Bird", 7);
     }
 }
