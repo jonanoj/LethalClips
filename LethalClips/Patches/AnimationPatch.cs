@@ -8,8 +8,10 @@ internal class AnimationPatch {
 
     [HarmonyPatch(typeof(FlowermanAI), "killAnimation")]
     [HarmonyPrefix]
-    private static void Bracken() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Strangled, "Bracken", -1);
+    private static void Bracken(FlowermanAI __instance) {
+        if(__instance.inSpecialAnimationWithPlayer == KillPatch.Player) {
+            KillPatch.Kill(TranslatedCauseOfDeath.Strangled, "Bracken", -1);
+        }
     }
 
     [HarmonyPatch(typeof(MouthDogAI), "KillPlayer")]
@@ -24,7 +26,7 @@ internal class AnimationPatch {
     private static void ForestKeeper() {
         // it's pretty common to escape the animation, so don't hard-claim death
         // TODO: try to hook into these animations a little more closely to claim death only when about to die
-        KillPatch.Kill(TranslatedCauseOfDeath.Devoured, "ForestKeeper", 6);
+        KillPatch.Kill(TranslatedCauseOfDeath.Devoured, "Forest Keeper", 6);
     }
 
     [HarmonyPatch(typeof(JesterAI), "killPlayerAnimation")]
