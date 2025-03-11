@@ -16,8 +16,10 @@ internal class AnimationPatch {
 
     [HarmonyPatch(typeof(MouthDogAI), "KillPlayer")]
     [HarmonyPrefix]
-    private static void EyelessDog() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Mauled, "Eyeless Dog", -1);
+    private static void EyelessDog(int playerID) {
+        if(0 <= playerID && playerID < StartOfRound.Instance.allPlayerScripts.Length && StartOfRound.Instance.allPlayerScripts[playerID] == KillPatch.Player) {
+            KillPatch.Kill(TranslatedCauseOfDeath.Mauled, "Eyeless Dog", -1);
+        }
     }
 
 
