@@ -33,7 +33,7 @@ internal class AnimationPatch {
     [HarmonyPrefix]
     private static void Jester(int playerId) {
         if(0 <= playerId && playerId < StartOfRound.Instance.allPlayerScripts.Length && StartOfRound.Instance.allPlayerScripts[playerId] == KillPatch.Player) {
-            KillPatch.Kill(TranslatedCauseOfDeath.Sliced, "Jester", 6);
+            KillPatch.Kill(TranslatedCauseOfDeath.Mauled, "Jester", -1);
         }
     }
 
