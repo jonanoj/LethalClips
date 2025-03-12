@@ -64,14 +64,14 @@ internal static class KillPatch {
 
     internal static void Kill(TranslatedCauseOfDeath cause, string source, float timeout = 0.1f) {
         if(time < 0) {
-            return; // something has already hard-claimed cause of death
+            return; // player already has an inevitable cause of death registered
         }
         KillPatch.cause = cause;
         KillPatch.source = source;
         if(timeout >= 0) {
             time = Time.time + timeout;
         } else {
-            time = -1; // nothing else can modify cause of death anymore
+            time = -1; // signals that this death is inevitable; nothing else can modify cause of death anymore
         }
     }
 
@@ -96,8 +96,8 @@ internal static class KillPatch {
 
             Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
+                "You died",
                 Message,
-                "git gud lol", // TODO: better description
                 "steam_death",
                 0,
                 0,
