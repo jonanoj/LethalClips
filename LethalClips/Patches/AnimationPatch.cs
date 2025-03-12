@@ -1,10 +1,11 @@
-﻿using HarmonyLib;
+﻿using GameNetcodeStuff;
+using HarmonyLib;
 
 namespace LethalClips.Patches;
 
 
 [HarmonyPatch()]
-internal class AnimationPatch {
+internal static class AnimationPatch {
 
     [HarmonyPatch(typeof(FlowermanAI), "killAnimation")]
     [HarmonyPrefix]
@@ -25,10 +26,12 @@ internal class AnimationPatch {
 
     [HarmonyPatch(typeof(ForestGiantAI), "EatPlayerAnimation")]
     [HarmonyPrefix]
-    private static void ForestKeeper() {
-        // it's pretty common to escape the animation, so don't hard-claim death
-        // TODO: try to hook into these animations a little more closely to claim death only when about to die
-        KillPatch.Kill(TranslatedCauseOfDeath.Devoured, "Forest Keeper", 6);
+    private static void ForestKeeper(PlayerControllerB playerBeingEaten) {
+        if(playerBeingEaten == KillPatch.Player) {
+            // it's pretty common to escape the animation, so don't hard-claim death
+            // TODO: try to hook into these animations a little more closely to claim death only when about to die
+            KillPatch.Kill(TranslatedCauseOfDeath.Devoured, "Forest Keeper", 6);
+        }
     }
 
     [HarmonyPatch(typeof(JesterAI), "killPlayerAnimation")]
@@ -42,12 +45,18 @@ internal class AnimationPatch {
     [HarmonyPatch(typeof(MaskedPlayerEnemy), "killAnimation")]
     [HarmonyPrefix]
     private static void Masked(MaskedPlayerEnemy __instance) {
-        KillPatch.Kill(TranslatedCauseOfDeath.Infected, __instance.mimickingPlayer?.playerUsername ?? "Masked", 5);
+        if(__instance.inSpecialAnimationWithPlayer == KillPatch.Player) {
+            // see comment on giant
+            KillPatch.Kill(TranslatedCauseOfDeath.Infected, __instance.mimickingPlayer?.playerUsername ?? "Masked", 5);
+        }
     }
 
     [HarmonyPatch(typeof(RadMechAI), "TorchPlayerAnimation")]
     [HarmonyPrefix]
-    private static void OldBird() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Incinerated, "Old Bird", 7);
+    private static void OldBird(RadMechAI __instance) {
+        if(__instance.inSpecialAnimationWithPlayer == KillPatch.Player) {
+            // see comment on giant
+            KillPatch.Kill(TranslatedCauseOfDeath.Incinerated, "Old Bird", 7);
+        }
     }
 }

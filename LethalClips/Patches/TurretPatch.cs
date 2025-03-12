@@ -7,7 +7,7 @@ using P = Turret;
 
 [HarmonyPatch(typeof(P), "Update")]
 internal static class TurretPatch {
-    internal static void Prefix(
+    private static void Prefix(
         P __instance,
         float ___turretInterval,
         bool ___enteringBerserkMode

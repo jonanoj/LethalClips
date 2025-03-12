@@ -7,7 +7,7 @@ using P = EnemyAI;
 
 
 [HarmonyPatch(typeof(P), nameof(P.OnCollideWithPlayer))]
-internal class DamagePatch {
+internal static class DamagePatch {
     private static void Prefix(
         P __instance,
         Collider other
