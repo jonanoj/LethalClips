@@ -22,8 +22,7 @@ internal static class AnimationPatch {
             KillPatch.Kill(TranslatedCauseOfDeath.Mauled, "Eyeless Dog", -1);
         }
     }
-
-
+    
     [HarmonyPatch(typeof(ForestGiantAI), "EatPlayerAnimation")]
     [HarmonyPrefix]
     private static void ForestKeeper(PlayerControllerB playerBeingEaten) {
