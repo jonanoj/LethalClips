@@ -12,6 +12,11 @@ internal class StartOfRoundPatch
     {
         Plugin.Log.LogDebug("OpeningDoorsSequence called");
 
+        if (!Plugin.ClipConfig.ClipRound.Value)
+        {
+            return;
+        }
+
         // TODO: consider using the SetTimelineGameMode API instead
         try
         {
@@ -36,6 +41,11 @@ internal class StartOfRoundPatch
     private static void ShipHasLeft()
     {
         Plugin.Log.LogDebug("ShipHasLeft called");
+
+        if (!Plugin.ClipConfig.ClipRound.Value)
+        {
+            return;
+        }
 
         try
         {

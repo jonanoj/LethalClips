@@ -94,8 +94,14 @@ internal static class KillPatch {
                 source = "";
             }
 
+            time = 0; // reset cause of death
+
             Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
 
+            if(!Plugin.ClipConfig.ClipDeaths.Value) {
+                return;
+            }
+            
             try
             {
                 var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
@@ -105,15 +111,13 @@ internal static class KillPatch {
                     0,
                     0,
                     TimelineEventClipPriority.Standard
-            );
-            Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
+                );
+                Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
             }
             catch (Exception e)
             {
                 Plugin.Log.LogError($"Failed to add timeline event: {e}");
             }
-
-            time = 0; // reset cause of death
         }
     }
 }

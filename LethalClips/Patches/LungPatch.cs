@@ -10,6 +10,12 @@ internal class LungPatch
     private static void Prefix()
     {
         Plugin.Log.LogDebug("Someone took the apparatus");
+
+        if (!Plugin.ClipConfig.ClipApparatus.Value)
+        {
+            return;
+        }
+
         try
         {
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
