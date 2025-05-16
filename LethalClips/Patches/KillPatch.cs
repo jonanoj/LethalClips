@@ -95,15 +95,23 @@ internal static class KillPatch {
             }
 
             Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
-            var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                Message,
-                "git gud lol", // TODO: better description
-                "steam_death",
-                0,
-                0,
-                TimelineEventClipPriority.Standard
+
+            try
+            {
+                var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
+                    Message,
+                    "git gud lol", // TODO: better description
+                    "steam_death",
+                    0,
+                    0,
+                    TimelineEventClipPriority.Standard
             );
             Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Failed to add timeline event: {e}");
+            }
 
             time = 0; // reset cause of death
         }
