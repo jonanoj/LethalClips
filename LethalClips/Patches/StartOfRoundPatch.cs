@@ -50,7 +50,7 @@ internal class StartOfRoundPatch
         try
         {
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                "Ship has leff",
+                "Ship has left",
                 "Round ended",
                 "steam_completed",
                 0,

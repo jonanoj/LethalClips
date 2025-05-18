@@ -15,7 +15,7 @@ class ClipConfig
     {
         cfg.SaveOnConfigSet = false;
 
-        EnableMod = cfg.Bind("General", "Enabled", true, "Set to false to disable the entirely.");
+        EnableMod = cfg.Bind("General", "Enabled", true, "Set to false to disable the mod entirely.");
         cfg.Save();
 
         ClipDeaths = cfg.Bind("Clips", "Clip Deaths", true, "Create clips for player deaths");
