@@ -94,18 +94,30 @@ internal static class KillPatch {
                 source = "";
             }
 
-            Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
-            var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                Message,
-                "git gud lol", // TODO: better description
-                "steam_death",
-                0,
-                0,
-                TimelineEventClipPriority.Standard
-            );
-            Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
-
             time = 0; // reset cause of death
+
+            Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
+
+            if(!Plugin.ClipConfig.ClipDeaths.Value) {
+                return;
+            }
+            
+            try
+            {
+                var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
+                    Message,
+                    "git gud lol", // TODO: better description
+                    "steam_death",
+                    0,
+                    0,
+                    TimelineEventClipPriority.Standard
+                );
+                Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Failed to add timeline event: {e}");
+            }
         }
     }
 }
