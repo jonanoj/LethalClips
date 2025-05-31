@@ -15,8 +15,8 @@ public static class AnimationPatch {
 
     [HarmonyPatch(typeof(MouthDogAI), "KillPlayer")]
     [HarmonyPrefix]
-    public static void EyelessDog(int playerID) {
-        var player = PlayerState.Of(Player.FromID(playerID));
+    public static void EyelessDog(int playerId) {
+        var player = PlayerState.Of(Player.FromID(playerId));
         player.Kill(ExtendedCauseOfDeath.Mauled, "Eyeless Dog", -1);
     }
 

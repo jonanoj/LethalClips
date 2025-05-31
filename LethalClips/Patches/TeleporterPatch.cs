@@ -9,16 +9,19 @@ using LethalClips;
 public class TeleporterPatch {
     [HarmonyPostfix]
     [HarmonyPatch(nameof(ShipTeleporter.beamUpPlayer))]
-    public static void BeamUpPlayer(ref IEnumerator __result, PlayerControllerB playerScript) {
+    public static void BeamUpPlayer(ref IEnumerator __result) {
         // since the original function is a coroutine, we need to wrap the output to properly postfix
         var original = __result;
         __result = Wrapper();
 
         IEnumerator Wrapper() {
+            // save this before the coroutine runs
+            var player = StartOfRound.Instance.mapScreen.targetedPlayer;
+
             yield return original;
 
-            if(Config.Clips.Teleporter.Value && playerScript == Player.Local) {
-                var description = $"{(playerScript.isPlayerDead ? "Yoink" : "Sav")}ed by the teleporter";
+            if(Config.Clips.Teleporter.Value && player == Player.Local) {
+                var description = $"{(player.isPlayerDead ? "Yoink" : "Sav")}ed by the teleporter";
                 Steam.AddEvent("Teleported", description, Steam.Icon.Transfer);
             }
         }
