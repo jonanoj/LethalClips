@@ -8,8 +8,8 @@ namespace LethalClips.Patches;
 public class LandmineState : State<Landmine, LandmineState> {
     public PlayerControllerB detonator;
     private string DetonatorName => !detonator || detonator == Player.Local ? "Landmine" : detonator.playerUsername;
-
-    public void SpawnExplosion(Vector3 explosionPosition, float killRange, float damageRange, int nonLethalDamage) {
+    
+    public static void SpawnExplosion(Vector3 explosionPosition, float killRange, float damageRange, int nonLethalDamage, string source) {
         // simulate an explosion to see if we need to trigger a kill
         var array = Physics.OverlapSphere(explosionPosition, damageRange, 2621448, QueryTriggerInteraction.Collide);
         for(int i = 0; i < array.Length; i++) {
@@ -23,13 +23,17 @@ public class LandmineState : State<Landmine, LandmineState> {
                 var player = obj.GetState<PlayerControllerB, PlayerState>();
                 // set the cause of death
                 if(dist < killRange) {
-                    player.Kill(ExtendedCauseOfDeath.Exploded, DetonatorName);
+                    player.Kill(ExtendedCauseOfDeath.Exploded, source);
                 } else if(dist < damageRange) {
-                    player.Damage(ExtendedCauseOfDeath.Exploded, DetonatorName, nonLethalDamage);
+                    player.Damage(ExtendedCauseOfDeath.Exploded, source, nonLethalDamage);
                 }
                 break;
             }
         }
+    }
+
+    public void SpawnExplosion(Vector3 explosionPosition, float killRange, float damageRange, int nonLethalDamage) {
+        SpawnExplosion(explosionPosition, killRange, damageRange, nonLethalDamage, DetonatorName);
     }
 }
 

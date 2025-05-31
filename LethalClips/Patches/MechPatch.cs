@@ -23,7 +23,7 @@ public class MechPatch {
     [HarmonyPrefix]
     [HarmonyPatch(nameof(RadMechAI.SetExplosion))]
     public static void SetExplosion(Vector3 explosionPosition, Vector3 forwardRotation) {
-        // TODO: this needs fixing
-        LandminePatch_Detonate.SpawnExplosion(explosionPosition - forwardRotation * 0.1f, 1f, 7f, 30, "Old Bird");
+        // steal explosion code from landmines, since this is what old birds do
+        LandmineState.SpawnExplosion(explosionPosition - forwardRotation * 0.1f, 1f, 7f, 30, "Old Bird");
     }
 }
