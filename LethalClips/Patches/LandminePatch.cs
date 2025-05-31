@@ -19,9 +19,8 @@ public class LandmineState : State<Landmine, LandmineState> {
                 continue;
             }
 
-            // TODO: would like a better way to just tryget the state
-            if(obj.layer == 3 && obj.TryGetComponent(out PlayerControllerB controller)) {
-                var player = PlayerState.Of(controller);
+            if(obj.layer == 3) {
+                var player = obj.GetState<PlayerControllerB, PlayerState>();
                 // set the cause of death
                 if(dist < killRange) {
                     player.Kill(ExtendedCauseOfDeath.Exploded, DetonatorName);

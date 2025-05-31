@@ -20,10 +20,7 @@ public class GiantPatch {
             QueryTriggerInteraction.Ignore
         );
         for(int i = 0; i < array.Length; i++) {
-            if(array[i].transform.TryGetComponent(out PlayerControllerB component)) {
-                var player = PlayerState.Of(component);
-                player.Damage(ExtendedCauseOfDeath.Crushed, "Forest Keeper", 30);
-            }
+            array[i].transform.GetState<PlayerControllerB, PlayerState>().Damage(ExtendedCauseOfDeath.Crushed, "Forest Keeper", 30);
         }
     }
 }
