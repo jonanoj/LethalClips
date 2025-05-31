@@ -24,7 +24,7 @@ internal class GiantPatch {
         for(int i = 0; i < array.Length; i++) {
             PlayerControllerB player = array[i].transform.GetComponent<PlayerControllerB>();
             if(player == KillPatch.Player) {
-                KillPatch.Kill(TranslatedCauseOfDeath.Crushed, "Forest Keeper");
+                KillPatch.Kill(ExtendedCauseOfDeath.Crushed, "Forest Keeper");
             }
         }
     }

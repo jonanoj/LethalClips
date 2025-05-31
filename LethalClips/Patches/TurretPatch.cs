@@ -20,7 +20,7 @@ internal static class TurretPatch {
             && ___turretInterval >= 0.21f
             && __instance.CheckForPlayersInLineOfSight(3f) == KillPatch.Player
          ) {
-            KillPatch.Damage(TranslatedCauseOfDeath.Shot, "Turret", 50);
+            KillPatch.Damage(ExtendedCauseOfDeath.Shot, "Turret", 50);
         }
     }
 }

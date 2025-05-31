@@ -7,8 +7,8 @@ namespace LethalClips.Patches;
 using P = Landmine;
 
 
-internal class Player {
-    internal PlayerControllerB player;
+public class PlayerState : State<P, PlayerState> {
+    public PlayerControllerB player;
 }
 
 [HarmonyPatch(typeof(P), "OnTriggerExit")]
@@ -27,7 +27,7 @@ internal class LandminePatch_OnTriggerExit {
         while(t) {
             if(t.TryGetComponent<PlayerControllerB>(out var player)) {
                 // blame the player for death
-                State<Player>.Of(__instance).player = player;
+                PlayerState.Of(__instance).player = player;
                 break;
             }
             t = t.parent;
@@ -52,9 +52,9 @@ internal class LandminePatch_Detonate {
             if(obj.layer == 3 && obj.GetComponent<PlayerControllerB>() == KillPatch.Player) {
                 // set the cause of death
                 if(dist < killRange) {
-                    KillPatch.Kill(TranslatedCauseOfDeath.Exploded, source);
+                    KillPatch.Kill(ExtendedCauseOfDeath.Exploded, source);
                 } else if(dist < damageRange) {
-                    KillPatch.Damage(TranslatedCauseOfDeath.Exploded, source, nonLethalDamage);
+                    KillPatch.Damage(ExtendedCauseOfDeath.Exploded, source, nonLethalDamage);
                 }
                 break;
             }
@@ -68,7 +68,7 @@ internal class LandminePatch_Detonate {
     }
     
     private static string Blame(P __instance) {
-        var blame = State<Player>.Of(__instance).player;
+        var blame = PlayerState.Of(__instance).player;
         return blame == null || blame == KillPatch.Player ? "Landmine" : blame.playerUsername;
     }
 }

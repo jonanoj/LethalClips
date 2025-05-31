@@ -9,44 +9,16 @@ namespace LethalClips.Patches;
 using P = PlayerControllerB;
 
 
-enum TranslatedCauseOfDeath {
-    Killed, // Unknown
-    Bludgeoned, // Bludgeoning
-    SPLAT, // Gravity
-    Exploded, // Blast
-    Strangled, // Strangulation
-    Suffocated, // Suffocation
-    Mauled, // Mauling
-    Shot, // Gunshots
-    Crushed, // Crushing
-    Drowned, // Drowning
-    Abandoned, // Abandoned
-    Electrocuted, // Electrocution
-    Kicked, // Kicking
-    Incinerated, // Burning
-    Stabbed, // Stabbing
-    Sliced, // Fan
-    Crashed, // Inertia
-    Snipped, // Snipped
-    Devoured,
-    Springed,
-    Died,
-    Disintegrated,
-    Infected,
-    Embarrassing
-}
-
-
 [HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
 internal static class KillPatch {
 
-    private static TranslatedCauseOfDeath cause;
+    private static ExtendedCauseOfDeath cause;
     private static string source;
     private static float time;
 
     internal static string Message {
         get {
-            string message = Enum.GetName(typeof(TranslatedCauseOfDeath), cause) ?? "Killed";
+            string message = Enum.GetName(typeof(ExtendedCauseOfDeath), cause) ?? "Killed";
             if(!string.IsNullOrEmpty(source)) {
                 message += " by " + source;
             }
@@ -56,13 +28,13 @@ internal static class KillPatch {
 
     internal static P Player => GameNetworkManager.Instance.localPlayerController;
 
-    internal static void Damage(TranslatedCauseOfDeath cause, string source, float damage) {
+    internal static void Damage(ExtendedCauseOfDeath cause, string source, float damage) {
         if(Player.health <= damage && (damage > 50 || Player.criticallyInjured)) {
             Kill(cause, source);
         }
     }
 
-    internal static void Kill(TranslatedCauseOfDeath cause, string source, float timeout = 0.1f) {
+    internal static void Kill(ExtendedCauseOfDeath cause, string source, float timeout = 0.1f) {
         if(time < 0) {
             return; // player already has an inevitable cause of death registered
         }
@@ -90,7 +62,7 @@ internal static class KillPatch {
         // use stored value to determine if we actually need to do anything
         if(__state) {
             if(0 <= time && time < Time.time) {
-                cause = (TranslatedCauseOfDeath)causeOfDeath;
+                cause = (ExtendedCauseOfDeath)causeOfDeath;
                 source = "";
             }
 
@@ -98,7 +70,7 @@ internal static class KillPatch {
 
             Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
 
-            if(!Plugin.ClipConfig.ClipDeaths.Value) {
+            if(!Config.Clips.Deaths.Value) {
                 return;
             }
             

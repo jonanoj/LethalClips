@@ -16,7 +16,7 @@ internal class FleaPatch {
         // simulate a damage tick
         if(___damagePlayerInterval <= 0f && !___inDroppingOffPlayerAnim) {
             if(__instance.stunNormalizedTimer <= 0f && (StartOfRound.Instance.connectedPlayersAmount > 0 || KillPatch.Player.health > 15 || ___singlePlayerSecondChanceGiven)) {
-                KillPatch.Damage(TranslatedCauseOfDeath.Suffocated, "Snare Flea", 10);
+                KillPatch.Damage(ExtendedCauseOfDeath.Suffocated, "Snare Flea", 10);
             }
         }
     }

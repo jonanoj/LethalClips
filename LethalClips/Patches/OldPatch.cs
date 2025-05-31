@@ -18,9 +18,9 @@ internal class OldPatch {
         double num = Vector3.Distance(KillPatch.Player.transform.position, stompTransform.position);
         if(num < radius) {
             if(num < radius * 0.175) {
-                KillPatch.Damage(TranslatedCauseOfDeath.Crushed, "Old Bird", 70);
+                KillPatch.Damage(ExtendedCauseOfDeath.Crushed, "Old Bird", 70);
             } else if(num < radius * 0.5f) {
-                KillPatch.Damage(TranslatedCauseOfDeath.Crushed, "Old Bird", 30);
+                KillPatch.Damage(ExtendedCauseOfDeath.Crushed, "Old Bird", 30);
             }
         }
     }

@@ -70,7 +70,7 @@ internal class TeleporterPatch
         var description = $"Teleported by {teleporterType} teleporter";
         Plugin.Log.LogDebug(description);
 
-        if (!Plugin.ClipConfig.ClipTeleporter.Value)
+        if (!Config.Clips.Teleporter.Value)
         {
             return;
         }

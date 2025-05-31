@@ -42,7 +42,7 @@ internal class ShotgunPatch {
         }
 
         if(hit) {
-            KillPatch.Damage(TranslatedCauseOfDeath.Shot, blame, damageNumber);
+            KillPatch.Damage(ExtendedCauseOfDeath.Shot, blame, damageNumber);
         }
     }
 }

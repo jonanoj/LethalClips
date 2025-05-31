@@ -20,22 +20,22 @@ internal static class DamagePatch {
         }
 
         var (cause, source, damage) = __instance switch {
-            ClaySurgeonAI => (TranslatedCauseOfDeath.Snipped, "Barber", KILL),
-            RedLocustBees => (TranslatedCauseOfDeath.Electrocuted, "Circuit Bees", 10),
-            ButlerEnemyAI => (TranslatedCauseOfDeath.Stabbed, "Butler", 10),
-            SpringManAI => (TranslatedCauseOfDeath.Springed, "Coil-Head", 90),
-            BushWolfEnemy => (TranslatedCauseOfDeath.Mauled, "Kidnapper Fox", KILL),
-            DressGirlAI => (TranslatedCauseOfDeath.Died, "", KILL),
-            BaboonBirdAI => (TranslatedCauseOfDeath.Stabbed, "Baboon Hawk", 20),
-            ButlerBeesEnemyAI => (TranslatedCauseOfDeath.Stabbed, "Mask Hornets", 10),
-            PufferAI => (TranslatedCauseOfDeath.Embarrassing, "", 20),
-            HoarderBugAI => (TranslatedCauseOfDeath.Mauled, "Hoarding Bug", 30),
-            CaveDwellerAI => (TranslatedCauseOfDeath.Mauled, "Maneater", KILL),
-            NutcrackerEnemyAI => (TranslatedCauseOfDeath.Kicked, "Nutcracker", KILL),
-            BlobAI => (TranslatedCauseOfDeath.Disintegrated, "Hydrogere", 35),
-            SandSpiderAI => (TranslatedCauseOfDeath.Mauled, "Bunker Spider", 90),
-            CrawlerAI => (TranslatedCauseOfDeath.Mauled, "Thumper", 40),
-            SandWormAI => (TranslatedCauseOfDeath.Devoured, "Earth Leviathan", KILL),
+            ClaySurgeonAI => (ExtendedCauseOfDeath.Snipped, "Barber", KILL),
+            RedLocustBees => (ExtendedCauseOfDeath.Electrocuted, "Circuit Bees", 10),
+            ButlerEnemyAI => (ExtendedCauseOfDeath.Stabbed, "Butler", 10),
+            SpringManAI => (ExtendedCauseOfDeath.Springed, "Coil-Head", 90),
+            BushWolfEnemy => (ExtendedCauseOfDeath.Mauled, "Kidnapper Fox", KILL),
+            DressGirlAI => (ExtendedCauseOfDeath.Died, "", KILL),
+            BaboonBirdAI => (ExtendedCauseOfDeath.Stabbed, "Baboon Hawk", 20),
+            ButlerBeesEnemyAI => (ExtendedCauseOfDeath.Stabbed, "Mask Hornets", 10),
+            PufferAI => (ExtendedCauseOfDeath.Embarrassing, "", 20),
+            HoarderBugAI => (ExtendedCauseOfDeath.Mauled, "Hoarding Bug", 30),
+            CaveDwellerAI => (ExtendedCauseOfDeath.Mauled, "Maneater", KILL),
+            NutcrackerEnemyAI => (ExtendedCauseOfDeath.Kicked, "Nutcracker", KILL),
+            BlobAI => (ExtendedCauseOfDeath.Disintegrated, "Hydrogere", 35),
+            SandSpiderAI => (ExtendedCauseOfDeath.Mauled, "Bunker Spider", 90),
+            CrawlerAI => (ExtendedCauseOfDeath.Mauled, "Thumper", 40),
+            SandWormAI => (ExtendedCauseOfDeath.Devoured, "Earth Leviathan", KILL),
             _ => default
         };
 

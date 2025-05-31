@@ -13,24 +13,22 @@ public class Plugin : BaseUnityPlugin {
     const string VERSION = "0.0.3";
 
     internal static ManualLogSource Log;
-    internal static ClipConfig ClipConfig;
 
 
     internal void Awake()
     {
         Log = Logger;
-        ClipConfig = new ClipConfig(base.Config);
+        LethalClips.Config.Initialize(Config);
 
-        if (!ClipConfig.EnableMod.Value)
+        if (!LethalClips.Config.General.Enabled.Value)
         {
-            Log.LogWarning($"Mod is disabled in the config, not patching.");
+            Log.LogWarning($"Mod is disabled. No patching will occur. To enable the mod, edit the configuration file and restart the game.");
             return;
         }
 
         Harmony harmony = new(GUID);
         harmony.PatchAll();
-        foreach (var item in harmony.GetPatchedMethods())
-        {
+        foreach(var item in harmony.GetPatchedMethods()) {
             Log.LogInfo($"Patched method {item}.");
         }
         Log.LogInfo($"Successfully loaded {NAME} ({GUID}) v{VERSION}!");

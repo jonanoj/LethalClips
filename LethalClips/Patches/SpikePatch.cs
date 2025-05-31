@@ -19,7 +19,7 @@ internal static class SpikePatch {
 
         PlayerControllerB component = other.gameObject.GetComponent<PlayerControllerB>();
         if(component == KillPatch.Player && !component.isPlayerDead) {
-            KillPatch.Kill(TranslatedCauseOfDeath.Crushed, "Spike Trap");
+            KillPatch.Kill(ExtendedCauseOfDeath.Crushed, "Spike Trap");
         }
     }
 }

@@ -12,7 +12,7 @@ internal class StartOfRoundPatch
     {
         Plugin.Log.LogDebug("OpeningDoorsSequence called");
 
-        if (!Plugin.ClipConfig.ClipRound.Value)
+        if (!Config.Clips.Rounds.Value)
         {
             return;
         }
@@ -42,7 +42,7 @@ internal class StartOfRoundPatch
     {
         Plugin.Log.LogDebug("ShipHasLeft called");
 
-        if (!Plugin.ClipConfig.ClipRound.Value)
+        if (!Config.Clips.Rounds.Value)
         {
             return;
         }

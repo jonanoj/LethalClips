@@ -11,7 +11,7 @@ internal class LungPatch
     {
         Plugin.Log.LogDebug("Someone took the apparatus");
 
-        if (!Plugin.ClipConfig.ClipApparatus.Value)
+        if (!Config.Clips.Apparatus.Value)
         {
             return;
         }
