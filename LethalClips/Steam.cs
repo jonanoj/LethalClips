@@ -8,16 +8,16 @@ namespace LethalClips;
 public static class Steam {
     public enum Icon {
         Death,
+        Caution,
         Transfer,
         Flag,
         Completed,
-        Caution
     }
 
     public static string IconToString(Icon icon) {
         return icon switch {
             Icon.Death => "steam_death",
-            Icon.Caution => "steam_warning",
+            Icon.Caution => "steam_caution",
             Icon.Transfer => "steam_transfer",
             Icon.Flag => "steam_flag",
             Icon.Completed => "steam_completed",
