@@ -9,15 +9,14 @@ public static class TurretPatch {
     [HarmonyPatch(nameof(Turret.Update))]
     public static void Update(Turret __instance) {
         // run through all the checks to see if player got shot
-        var player = KillState.Player;
         if(
             !__instance.turretActive
             && (__instance.turretMode == TurretMode.Firing || __instance.turretMode == TurretMode.Berserk)
             && !(__instance.turretMode == TurretMode.Berserk && __instance.enteringBerserkMode)
             && __instance.turretInterval >= 0.21f
-            && __instance.CheckForPlayersInLineOfSight(3f) == player.Instance
+            && __instance.CheckForPlayersInLineOfSight(3f) == Player.Local
          ) {
-            player.Damage(ExtendedCauseOfDeath.Shot, "Turret", 50);
+            PlayerState.Local.Damage(ExtendedCauseOfDeath.Shot, "Turret", 50);
         }
     }
 }

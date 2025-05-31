@@ -37,7 +37,7 @@ public static class DamagePatch {
         };
 
         // TODO: get enemy internal timers to check if they can actually damage the player
-        var player = KillState.Player;
+        var player = PlayerState.Local;
         if(damage == KILL) {
             player.Kill(cause, source);
         } else {

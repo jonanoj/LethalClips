@@ -15,7 +15,7 @@ public static class SpikePatch {
         }
 
         if(other.gameObject.TryGetComponent(out PlayerControllerB component) && !component.isPlayerDead) {
-            var state = KillState.Of(component);
+            var state = PlayerState.Of(component);
             state.Kill(ExtendedCauseOfDeath.Crushed, "Spike Trap");            
         }
     }

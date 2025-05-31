@@ -19,10 +19,9 @@ public class ShotgunPatch {
         }
 
         // simulate a shot to see if we need to trigger a kill
-        var localPlayer = KillState.Player.Instance;
-        bool heldByPlayer = __instance.isHeld && __instance.playerHeldBy == localPlayer;
-        float dist = Vector3.Distance(localPlayer.transform.position, __instance.shotgunRayPoint.transform.position);
-        Vector3 vector = localPlayer.playerCollider.ClosestPoint(shotgunPosition);
+        bool heldByPlayer = __instance.isHeld && __instance.playerHeldBy == Player.Local;
+        float dist = Vector3.Distance(Player.Local.transform.position, __instance.shotgunRayPoint.transform.position);
+        Vector3 vector = Player.Local.playerCollider.ClosestPoint(shotgunPosition);
         
         bool hit = !heldByPlayer;
         hit &= !Physics.Linecast(shotgunPosition, vector, StartOfRound.Instance.collidersAndRoomMaskAndDefault, QueryTriggerInteraction.Ignore);
@@ -38,7 +37,7 @@ public class ShotgunPatch {
         }
 
         if(hit) {
-            KillState.Player.Damage(ExtendedCauseOfDeath.Shot, shooter, damageNumber);
+            PlayerState.Local.Damage(ExtendedCauseOfDeath.Shot, shooter, damageNumber);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace LethalClips.Patches;
 
 public class LandmineState : State<Landmine, LandmineState> {
     public PlayerControllerB detonator;
-    private string DetonatorName => !detonator || detonator == GameNetworkManager.Instance.localPlayerController ? "Landmine" : detonator.playerUsername;
+    private string DetonatorName => !detonator || detonator == Player.Local ? "Landmine" : detonator.playerUsername;
 
     public void SpawnExplosion(Vector3 explosionPosition, float killRange, float damageRange, int nonLethalDamage) {
         // simulate an explosion to see if we need to trigger a kill
@@ -21,7 +21,7 @@ public class LandmineState : State<Landmine, LandmineState> {
 
             // TODO: would like a better way to just tryget the state
             if(obj.layer == 3 && obj.TryGetComponent(out PlayerControllerB controller)) {
-                var player = KillState.Of(controller);
+                var player = PlayerState.Of(controller);
                 // set the cause of death
                 if(dist < killRange) {
                     player.Kill(ExtendedCauseOfDeath.Exploded, DetonatorName);

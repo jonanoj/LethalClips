@@ -7,8 +7,8 @@ using UnityEngine;
 namespace LethalClips.Patches;
 
 
-public class KillState : State<PlayerControllerB, KillState> {
-    public static KillState Player => Of(GameNetworkManager.Instance.localPlayerController);
+public class PlayerState : State<PlayerControllerB, PlayerState> {
+    public static PlayerState Local => Of(Player.Local);
     public ExtendedCauseOfDeath causeOfDeath;
     public string sourceOfDeath;
     public float deathTimeout;
@@ -76,13 +76,13 @@ public class KillState : State<PlayerControllerB, KillState> {
 
 
 [HarmonyPatch(typeof(PlayerControllerB))]
-public static class KillPatch {
+public static class PlayerPatch {
     [HarmonyPrefix]
     [HarmonyPatch(nameof(PlayerControllerB.KillPlayer))]
     private static void KillPlayer(PlayerControllerB __instance, CauseOfDeath causeOfDeath) {
         // the body of the method changes these values, so this needs to be a prefix
         if(__instance.IsOwner && !__instance.isPlayerDead && __instance.AllowPlayerDeath()) {
-            KillState.Of(__instance).AddMarker(causeOfDeath);
+            PlayerState.Of(__instance).AddMarker(causeOfDeath);
         }
     }
 }

@@ -44,7 +44,7 @@ public class TeleporterPatch {
         IEnumerator Wrapper() {
             yield return original;
 
-            if(playerScript == GameNetworkManager.Instance.localPlayerController) {
+            if(playerScript == Player.Local) {
                 TeleporterUtil.CreateTeleportEvent(inverse: false, playerScript.isPlayerDead);
             }
         }
@@ -60,8 +60,7 @@ public class TeleporterPatch {
         IEnumerator Wrapper() {
             yield return original;
 
-            var players = StartOfRound.Instance.allPlayerScripts;
-            if(0 <= playerObj && playerObj < players.Length && players[playerObj] == GameNetworkManager.Instance.localPlayerController) {
+            if(Player.FromID(playerObj) == Player.Local) {
                 TeleporterUtil.CreateTeleportEvent(inverse: true);
             }
         }

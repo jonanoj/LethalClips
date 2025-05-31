@@ -21,7 +21,7 @@ public class GiantPatch {
         );
         for(int i = 0; i < array.Length; i++) {
             if(array[i].transform.TryGetComponent(out PlayerControllerB component)) {
-                var player = KillState.Of(component);
+                var player = PlayerState.Of(component);
                 player.Damage(ExtendedCauseOfDeath.Crushed, "Forest Keeper", 30);
             }
         }

@@ -10,13 +10,12 @@ public class MechPatch {
     [HarmonyPatch(nameof(RadMechAI.Stomp))]
     public static void Stomp(Transform stompTransform, float radius) {
         // check if the player is within the stomp radius
-        var player = KillState.Player;
-        double num = Vector3.Distance(player.Instance.transform.position, stompTransform.position);
+        double num = Vector3.Distance(Player.Local.transform.position, stompTransform.position);
         if(num < radius) {
             if(num < radius * 0.175) {
-                player.Damage(ExtendedCauseOfDeath.Crushed, "Old Bird", 70);
+                PlayerState.Local.Damage(ExtendedCauseOfDeath.Crushed, "Old Bird", 70);
             } else if(num < radius * 0.5f) {
-                player.Damage(ExtendedCauseOfDeath.Crushed, "Old Bird", 30);
+                PlayerState.Local.Damage(ExtendedCauseOfDeath.Crushed, "Old Bird", 30);
             }
         }
     }
