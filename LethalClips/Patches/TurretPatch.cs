@@ -2,25 +2,22 @@
 
 namespace LethalClips.Patches;
 
-using P = Turret;
 
-
-[HarmonyPatch(typeof(P), "Update")]
-internal static class TurretPatch {
-    private static void Prefix(
-        P __instance,
-        float ___turretInterval,
-        bool ___enteringBerserkMode
-    ) {
+[HarmonyPatch(typeof(Turret))]
+public static class TurretPatch {
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(Turret.Update))]
+    public static void Update(Turret __instance, float ___turretInterval, bool ___enteringBerserkMode) {
         // run through all the checks to see if player got shot
+        var player = KillState.Player;
         if(
             !__instance.turretActive
             && (__instance.turretMode == TurretMode.Firing || __instance.turretMode == TurretMode.Berserk)
             && !(__instance.turretMode == TurretMode.Berserk && ___enteringBerserkMode)
             && ___turretInterval >= 0.21f
-            && __instance.CheckForPlayersInLineOfSight(3f) == KillPatch.Player
+            && __instance.CheckForPlayersInLineOfSight(3f) == player.Instance
          ) {
-            KillPatch.Damage(ExtendedCauseOfDeath.Shot, "Turret", 50);
+            player.Damage(ExtendedCauseOfDeath.Shot, "Turret", 50);
         }
     }
 }

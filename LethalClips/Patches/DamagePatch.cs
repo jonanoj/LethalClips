@@ -3,15 +3,12 @@ using UnityEngine;
 
 namespace LethalClips.Patches;
 
-using P = EnemyAI;
 
-
-[HarmonyPatch(typeof(P), nameof(P.OnCollideWithPlayer))]
-internal static class DamagePatch {
-    private static void Prefix(
-        P __instance,
-        Collider other
-    ) {
+[HarmonyPatch(typeof(EnemyAI))]
+public static class DamagePatch {
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(EnemyAI.OnCollideWithPlayer))]
+    private static void OnCollideWithPlayer(EnemyAI __instance, Collider other) {
         const int KILL = -1;
         var overrideIsInsideFactoryCheck = __instance is DressGirlAI;
 
@@ -40,10 +37,11 @@ internal static class DamagePatch {
         };
 
         // TODO: get enemy internal timers to check if they can actually damage the player
+        var player = KillState.Player;
         if(damage == KILL) {
-            KillPatch.Kill(cause, source);
+            player.Kill(cause, source);
         } else {
-            KillPatch.Damage(cause, source, damage);
+            player.Damage(cause, source, damage);
         }
     }
 }

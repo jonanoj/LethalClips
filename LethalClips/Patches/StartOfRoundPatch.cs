@@ -3,23 +3,18 @@ using HarmonyLib;
 using LethalClips;
 using Steamworks;
 
-[HarmonyPatch(typeof(StartOfRound))]
-internal class StartOfRoundPatch
-{
-    [HarmonyPatch(nameof(StartOfRound.openingDoorsSequence))]
-    [HarmonyPrefix]
-    private static void OpeningDoorsSequence()
-    {
-        Plugin.Log.LogDebug("OpeningDoorsSequence called");
 
-        if (!Config.Clips.Rounds.Value)
-        {
+[HarmonyPatch(typeof(StartOfRound))]
+public class StartOfRoundPatch {
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(StartOfRound.openingDoorsSequence))]
+    public static void OpeningDoorsSequence() {
+        if(!Config.Clips.Rounds.Value) {
             return;
         }
 
         // TODO: consider using the SetTimelineGameMode API instead
-        try
-        {
+        try {
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
                 "Ship has landed",
                 "Round start",
@@ -29,26 +24,19 @@ internal class StartOfRoundPatch
                 TimelineEventClipPriority.Standard
             );
             Plugin.Log.LogDebug($"Added timeline event {timelineEvent}.");
-        }
-        catch (Exception e)
-        {
+        } catch(Exception e) {
             Plugin.Log.LogError($"Failed to add timeline event: {e}");
         }
     }
 
-    [HarmonyPatch(nameof(StartOfRound.ShipHasLeft))]
     [HarmonyPrefix]
-    private static void ShipHasLeft()
-    {
-        Plugin.Log.LogDebug("ShipHasLeft called");
-
-        if (!Config.Clips.Rounds.Value)
-        {
+    [HarmonyPatch(nameof(StartOfRound.ShipHasLeft))]
+    public static void ShipHasLeft() {
+        if(!Config.Clips.Rounds.Value) {
             return;
         }
 
-        try
-        {
+        try {
             var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
                 "Ship has left",
                 "Round ended",
@@ -58,9 +46,7 @@ internal class StartOfRoundPatch
                 TimelineEventClipPriority.Standard
             );
             Plugin.Log.LogDebug($"Added timeline event {timelineEvent}.");
-        }
-        catch (Exception e)
-        {
+        } catch(Exception e) {
             Plugin.Log.LogError($"Failed to add timeline event: {e}");
         }
     }

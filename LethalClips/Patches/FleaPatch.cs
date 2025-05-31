@@ -2,21 +2,17 @@
 
 namespace LethalClips.Patches;
 
-using P = CentipedeAI;
 
-
-[HarmonyPatch(typeof(P), "DamagePlayerOnIntervals")]
-internal class FleaPatch {
-    private static void Prefix(
-        P __instance,
-        float ___damagePlayerInterval,
-        bool ___inDroppingOffPlayerAnim,
-        bool ___singlePlayerSecondChanceGiven
-    ) {
+[HarmonyPatch(typeof(CentipedeAI))]
+public class FleaPatch {
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(CentipedeAI.DamagePlayerOnIntervals))]
+    public static void DamagePlayerOnIntervals(CentipedeAI __instance, float ___damagePlayerInterval, bool ___inDroppingOffPlayerAnim, bool ___singlePlayerSecondChanceGiven) {
         // simulate a damage tick
+        var player = KillState.Player;
         if(___damagePlayerInterval <= 0f && !___inDroppingOffPlayerAnim) {
-            if(__instance.stunNormalizedTimer <= 0f && (StartOfRound.Instance.connectedPlayersAmount > 0 || KillPatch.Player.health > 15 || ___singlePlayerSecondChanceGiven)) {
-                KillPatch.Damage(ExtendedCauseOfDeath.Suffocated, "Snare Flea", 10);
+            if(__instance.stunNormalizedTimer <= 0f && (StartOfRound.Instance.connectedPlayersAmount > 0 || player.Instance.health > 15 || ___singlePlayerSecondChanceGiven)) {
+                player.Damage(ExtendedCauseOfDeath.Suffocated, "Snare Flea", 10);
             }
         }
     }

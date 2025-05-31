@@ -6,90 +6,83 @@ using UnityEngine;
 
 namespace LethalClips.Patches;
 
-using P = PlayerControllerB;
 
+public class KillState : State<PlayerControllerB, KillState> {
+    public static KillState Player => Of(GameNetworkManager.Instance.localPlayerController);
+    public ExtendedCauseOfDeath causeOfDeath;
+    public string sourceOfDeath;
+    public float deathTimeout;
 
-[HarmonyPatch(typeof(P), nameof(P.KillPlayer))]
-internal static class KillPatch {
-
-    private static ExtendedCauseOfDeath cause;
-    private static string source;
-    private static float time;
-
-    internal static string Message {
+    public string Message {
         get {
-            string message = Enum.GetName(typeof(ExtendedCauseOfDeath), cause) ?? "Killed";
-            if(!string.IsNullOrEmpty(source)) {
-                message += " by " + source;
+            string message = Enum.GetName(typeof(ExtendedCauseOfDeath), causeOfDeath) ?? "Killed";
+            if(!string.IsNullOrEmpty(sourceOfDeath)) {
+                message += " by " + sourceOfDeath;
             }
             return message;
         }
     }
 
-    internal static P Player => GameNetworkManager.Instance.localPlayerController;
+    public void Kill(ExtendedCauseOfDeath cause, string source, float timeout = 0.1f) {
+        if(deathTimeout < 0) {
+            return; // player already has an inevitable cause of death registered
+        }
 
-    internal static void Damage(ExtendedCauseOfDeath cause, string source, float damage) {
-        if(Player.health <= damage && (damage > 50 || Player.criticallyInjured)) {
+        causeOfDeath = cause;
+        sourceOfDeath = source;
+
+        if(timeout >= 0) {
+            deathTimeout = Time.time + timeout; // the time at which this cause of death expires
+        } else {
+            deathTimeout = -1; // signals that this death is inevitable; nothing else can modify cause of death anymore
+        }
+    }
+
+    public void Damage(ExtendedCauseOfDeath cause, string source, float damage) {
+        if(Instance.health <= damage && (damage > 50 || Instance.criticallyInjured)) {
             Kill(cause, source);
         }
     }
 
-    internal static void Kill(ExtendedCauseOfDeath cause, string source, float timeout = 0.1f) {
-        if(time < 0) {
-            return; // player already has an inevitable cause of death registered
+    public void AddMarker(CauseOfDeath causeOfDeath) {
+        if(0 <= deathTimeout && deathTimeout < Time.time) {
+            // the cached cause of death has expired, so use the vanilla values
+            this.causeOfDeath = (ExtendedCauseOfDeath)causeOfDeath;
+            sourceOfDeath = "";
         }
-        KillPatch.cause = cause;
-        KillPatch.source = source;
-        if(timeout >= 0) {
-            time = Time.time + timeout;
-        } else {
-            time = -1; // signals that this death is inevitable; nothing else can modify cause of death anymore
-        }
-    }
 
-    private static void Prefix(
-        P __instance,
-        ref bool __state
-    ) {
-        // the body of the method changes these values, so cache them now
-        __state = __instance.IsOwner && !__instance.isPlayerDead && __instance.AllowPlayerDeath();
-    }
+        Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
+        deathTimeout = 0; // reset cause of death
 
-    private static void Postfix(
-        bool __state,
-        CauseOfDeath causeOfDeath
-    ) {
-        // use stored value to determine if we actually need to do anything
-        if(__state) {
-            if(0 <= time && time < Time.time) {
-                cause = (ExtendedCauseOfDeath)causeOfDeath;
-                source = "";
-            }
-
-            time = 0; // reset cause of death
-
-            Plugin.Log.LogInfo($"Player died! Cause of death: {Message}");
-
+        try {
             if(!Config.Clips.Deaths.Value) {
                 return;
             }
-            
-            try
-            {
-                var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                    "You died!",
-                    Message,
-                    "steam_death",
-                    0,
-                    0,
-                    TimelineEventClipPriority.Standard
-                );
-                Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
-            }
-            catch (Exception e)
-            {
-                Plugin.Log.LogError($"Failed to add timeline event: {e}");
-            }
+
+            var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
+                "You died!",
+                Message,
+                "steam_death",
+                0,
+                0,
+                TimelineEventClipPriority.Standard
+            );
+            Plugin.Log.LogInfo($"Added timeline event {timelineEvent}.");
+        } catch(Exception e) {
+            Plugin.Log.LogError($"Failed to add timeline event: {e}");
+        }
+    }
+}
+
+
+[HarmonyPatch(typeof(PlayerControllerB))]
+public static class KillPatch {
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(PlayerControllerB.KillPlayer))]
+    private static void KillPlayer(PlayerControllerB __instance, CauseOfDeath causeOfDeath) {
+        // the body of the method changes these values, so this needs to be a prefix
+        if(__instance.IsOwner && !__instance.isPlayerDead && __instance.AllowPlayerDeath()) {
+            KillState.Of(__instance).AddMarker(causeOfDeath);
         }
     }
 }

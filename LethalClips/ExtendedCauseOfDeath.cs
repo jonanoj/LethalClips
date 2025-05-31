@@ -1,7 +1,7 @@
 ﻿namespace LethalClips;
 
 
-enum ExtendedCauseOfDeath {
+public enum ExtendedCauseOfDeath {
     Killed, // Unknown
     Bludgeoned, // Bludgeoning
     SPLAT, // Gravity
