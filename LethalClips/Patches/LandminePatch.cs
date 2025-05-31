@@ -38,8 +38,8 @@ public class LandmineState : State<Landmine, LandmineState> {
 public class LandminePatch {
     [HarmonyPrefix]
     [HarmonyPatch(nameof(Landmine.OnTriggerExit))]
-    public static void OnTriggerExit(Landmine __instance, Collider other, bool ___mineActivated) {
-        if(__instance.hasExploded || !___mineActivated) {
+    public static void OnTriggerExit(Landmine __instance, Collider other) {
+        if(__instance.hasExploded || !__instance.mineActivated) {
             return;
         }
 
