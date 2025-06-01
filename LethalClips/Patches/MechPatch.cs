@@ -6,8 +6,8 @@ namespace LethalClips.Patches;
 
 [HarmonyPatch(typeof(RadMechAI))]
 public class MechPatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(RadMechAI.Stomp))]
+    [HarmonyPrefix]
     public static void Stomp(Transform stompTransform, float radius) {
         // check if the player is within the stomp radius
         double num = Vector3.Distance(Player.Local.transform.position, stompTransform.position);
@@ -20,8 +20,8 @@ public class MechPatch {
         }
     }
 
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(RadMechAI.SetExplosion))]
+    [HarmonyPrefix]
     public static void SetExplosion(Vector3 explosionPosition, Vector3 forwardRotation) {
         // steal explosion code from landmines, since this is what old birds do
         LandmineState.SpawnExplosion(explosionPosition - forwardRotation * 0.1f, 1f, 7f, 30, "Old Bird");

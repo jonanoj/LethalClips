@@ -1,13 +1,12 @@
-using System;
 using HarmonyLib;
-using LethalClips;
-using Steamworks;
+
+namespace LethalClips.Patches;
 
 
 [HarmonyPatch(typeof(LungProp))]
 public class ApparatusPatch {
-    [HarmonyPostfix]
     [HarmonyPatch(nameof(LungProp.DisconnectFromMachinery))]
+    [HarmonyPostfix]
     public static void DisconnectFromMachinery() {
         if(Config.Clips.Apparatus.Value) {
             // TODO: identify who took the apparatus?

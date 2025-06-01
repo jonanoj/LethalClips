@@ -1,14 +1,13 @@
-using System.Collections;
-using GameNetcodeStuff;
 using HarmonyLib;
-using LethalClips;
+using System.Collections;
 
+namespace LethalClips.Patches;
 
 
 [HarmonyPatch(typeof(ShipTeleporter))]
 public class TeleporterPatch {
-    [HarmonyPostfix]
     [HarmonyPatch(nameof(ShipTeleporter.beamUpPlayer))]
+    [HarmonyPostfix]
     public static void BeamUpPlayer(ref IEnumerator __result) {
         // since the original function is a coroutine, we need to wrap the output to properly postfix
         var original = __result;
@@ -27,8 +26,8 @@ public class TeleporterPatch {
         }
     }
 
-    [HarmonyPostfix]
     [HarmonyPatch(nameof(ShipTeleporter.TeleportPlayerOutWithInverseTeleporter))]
+    [HarmonyPostfix]
     public static void TeleportPlayerOutWithInverseTeleporter(int playerObj) {
         if(Config.Clips.Teleporter.Value && Player.FromID(playerObj) == Player.Local) {
             Steam.AddEvent("Teleported", "Inverse teleported into the facility", Steam.Icon.Transfer);

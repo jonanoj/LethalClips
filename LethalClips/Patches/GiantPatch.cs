@@ -7,8 +7,8 @@ namespace LethalClips.Patches;
 
 [HarmonyPatch(typeof(ForestGiantAI))]
 public class GiantPatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(ForestGiantAI.AnimationEventA))]
+    [HarmonyPrefix]
     public static void AnimationEventA(ForestGiantAI __instance) {
         // crush players upon whom the giant falls
         RaycastHit[] array = Physics.SphereCastAll(
@@ -20,7 +20,8 @@ public class GiantPatch {
             QueryTriggerInteraction.Ignore
         );
         for(int i = 0; i < array.Length; i++) {
-            array[i].transform.GetState<PlayerControllerB, PlayerState>().Damage(ExtendedCauseOfDeath.Crushed, "Forest Keeper", 30);
+            var player = array[i].transform.GetState<PlayerControllerB, PlayerState>();
+            player.Damage(ExtendedCauseOfDeath.Crushed, "Forest Keeper", 30);
         }
     }
 }

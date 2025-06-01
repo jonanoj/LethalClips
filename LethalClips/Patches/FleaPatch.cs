@@ -5,8 +5,8 @@ namespace LethalClips.Patches;
 
 [HarmonyPatch(typeof(CentipedeAI))]
 public class FleaPatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(CentipedeAI.DamagePlayerOnIntervals))]
+    [HarmonyPrefix]
     public static void DamagePlayerOnIntervals(CentipedeAI __instance) {
         // simulate a damage tick
         if(

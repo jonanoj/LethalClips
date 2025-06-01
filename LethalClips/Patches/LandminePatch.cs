@@ -6,8 +6,8 @@ namespace LethalClips.Patches;
 
 
 public class LandmineState : State<Landmine, LandmineState> {
-    public PlayerControllerB detonator;
-    private string DetonatorName => !detonator || detonator == Player.Local ? "Landmine" : detonator.playerUsername;
+    public PlayerControllerB Detonator { get; set; }
+    public string DetonatorName => !Detonator || Detonator == Player.Local ? "Landmine" : Detonator.playerUsername;
     
     public static void SpawnExplosion(Vector3 explosionPosition, float killRange, float damageRange, int nonLethalDamage, string source) {
         Plugin.Log.LogWarning($"kabooming");
@@ -43,8 +43,8 @@ public class LandmineState : State<Landmine, LandmineState> {
 
 [HarmonyPatch(typeof(Landmine))]
 public class LandminePatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(Landmine.OnTriggerExit))]
+    [HarmonyPrefix]
     public static void OnTriggerExit(Landmine __instance, Collider other) {
         if(__instance.hasExploded || !__instance.mineActivated) {
             return;
@@ -55,15 +55,15 @@ public class LandminePatch {
         while(t) {
             if(t.TryGetComponent<PlayerControllerB>(out var player)) {
                 // blame the player for setting off the mine
-                LandmineState.Of(__instance).detonator = player;
+                LandmineState.Of(__instance).Detonator = player;
                 break;
             }
             t = t.parent;
         }
     }
 
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(Landmine.Detonate))]
+    [HarmonyPrefix]
     public static void Detonate(Landmine __instance) {
         var state = LandmineState.Of(__instance);
         state.SpawnExplosion(__instance.transform.position + Vector3.up, 5.7f, 6f, 50);

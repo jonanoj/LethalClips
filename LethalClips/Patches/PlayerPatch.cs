@@ -1,7 +1,6 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using GameNetcodeStuff;
-using Steamworks;
+using System;
 using UnityEngine;
 
 namespace LethalClips.Patches;
@@ -9,32 +8,32 @@ namespace LethalClips.Patches;
 
 public class PlayerState : State<PlayerControllerB, PlayerState> {
     public static PlayerState Local => Of(Player.Local);
-    public ExtendedCauseOfDeath causeOfDeath;
-    public string sourceOfDeath;
-    public float deathTimeout;
+    public ExtendedCauseOfDeath CauseOfDeath { get; private set; }
+    public string SourceOfDeath { get; private set; }
+    public float DeathTimeout { get; private set; }
 
     public string Message {
         get {
-            string message = Enum.GetName(typeof(ExtendedCauseOfDeath), causeOfDeath) ?? "Killed";
-            if(!string.IsNullOrEmpty(sourceOfDeath)) {
-                message += " by " + sourceOfDeath;
+            string message = Enum.GetName(typeof(ExtendedCauseOfDeath), CauseOfDeath) ?? "Killed";
+            if(!string.IsNullOrEmpty(SourceOfDeath)) {
+                message += " by " + SourceOfDeath;
             }
             return message;
         }
     }
 
     public void Kill(ExtendedCauseOfDeath cause, string source, float timeout = 0.1f) {
-        if(deathTimeout < 0) {
+        if(DeathTimeout < 0) {
             return; // player already has an inevitable cause of death registered
         }
 
-        causeOfDeath = cause;
-        sourceOfDeath = source;
+        CauseOfDeath = cause;
+        SourceOfDeath = source;
 
         if(timeout >= 0) {
-            deathTimeout = Time.time + timeout; // the time at which this cause of death expires
+            DeathTimeout = Time.time + timeout; // the time at which this cause of death expires
         } else {
-            deathTimeout = -1; // signals that this death is inevitable; nothing else can modify cause of death anymore
+            DeathTimeout = -1; // signals that this death is inevitable; nothing else can modify cause of death anymore
         }
     }
 
@@ -45,13 +44,13 @@ public class PlayerState : State<PlayerControllerB, PlayerState> {
     }
 
     public void TriggerDeathEvent(CauseOfDeath causeOfDeath) {
-        if(0 <= deathTimeout && deathTimeout < Time.time) {
+        if(0 <= DeathTimeout && DeathTimeout < Time.time) {
             // the cached cause of death has expired, so use the vanilla values
-            this.causeOfDeath = (ExtendedCauseOfDeath)causeOfDeath;
-            sourceOfDeath = "";
+            this.CauseOfDeath = (ExtendedCauseOfDeath)causeOfDeath;
+            SourceOfDeath = "";
         }
 
-        deathTimeout = 0; // reset cause of death
+        DeathTimeout = 0; // reset cause of death
         if(Config.Clips.Deaths.Value) {
             Steam.AddEvent("You died!", Message, Steam.Icon.Death, priority: 96);
         }
@@ -61,9 +60,9 @@ public class PlayerState : State<PlayerControllerB, PlayerState> {
 
 [HarmonyPatch(typeof(PlayerControllerB))]
 public static class PlayerPatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(PlayerControllerB.KillPlayer))]
-    private static void KillPlayer(PlayerControllerB __instance, CauseOfDeath causeOfDeath) {
+    [HarmonyPrefix]
+    public static void KillPlayer(PlayerControllerB __instance, CauseOfDeath causeOfDeath) {
         // the body of the method changes these values, so this needs to be a prefix
         if(__instance.IsOwner && !__instance.isPlayerDead && __instance.AllowPlayerDeath()) {
             PlayerState.Of(__instance).TriggerDeathEvent(causeOfDeath);

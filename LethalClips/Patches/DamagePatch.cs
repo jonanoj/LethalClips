@@ -6,9 +6,9 @@ namespace LethalClips.Patches;
 
 [HarmonyPatch(typeof(EnemyAI))]
 public static class DamagePatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(EnemyAI.OnCollideWithPlayer))]
-    private static void OnCollideWithPlayer(EnemyAI __instance, Collider other) {
+    [HarmonyPrefix]
+    public static void OnCollideWithPlayer(EnemyAI __instance, Collider other) {
         const int KILL = -1;
         var overrideIsInsideFactoryCheck = __instance is DressGirlAI;
 

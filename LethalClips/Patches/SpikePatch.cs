@@ -7,8 +7,8 @@ namespace LethalClips.Patches;
 
 [HarmonyPatch(typeof(SpikeRoofTrap))]
 public static class SpikePatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(SpikeRoofTrap.OnTriggerStay))]
+    [HarmonyPrefix]
     public static void OnTriggerStay(SpikeRoofTrap __instance, Collider other) {
         if(!__instance.trapActive || !__instance.slammingDown || Time.realtimeSinceStartup - __instance.timeSinceMovingUp < 0.75f) {
             return;

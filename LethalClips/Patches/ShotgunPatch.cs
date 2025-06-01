@@ -6,8 +6,8 @@ namespace LethalClips.Patches;
 
 [HarmonyPatch(typeof(ShotgunItem))]
 public class ShotgunPatch {
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(ShotgunItem.ShootGun))]
+    [HarmonyPrefix]
     public static void ShootGun(ShotgunItem __instance, Vector3 shotgunPosition, Vector3 shotgunForward) {
         string shooter;
         if(__instance.isHeldByEnemy) {
