@@ -3,30 +3,25 @@ using UnityEngine;
 
 namespace LethalClips.Patches;
 
-using P = ShotgunItem;
 
-
-[HarmonyPatch(typeof(P), "ShootGun")]
-internal class ShotgunPatch {
-    private static void Prefix(
-        P __instance,
-        Vector3 shotgunPosition,
-        Vector3 shotgunForward
-    ) {
-        // determine the shooter
-        string blame;
+[HarmonyPatch(typeof(ShotgunItem))]
+public class ShotgunPatch {
+    [HarmonyPatch(nameof(ShotgunItem.ShootGun))]
+    [HarmonyPrefix]
+    public static void ShootGun(ShotgunItem __instance, Vector3 shotgunPosition, Vector3 shotgunForward) {
+        string shooter;
         if(__instance.isHeldByEnemy) {
-            blame = "Nutcracker";
+            shooter = "Nutcracker";
         } else if(__instance.isHeld) {
-            blame = __instance.playerHeldBy?.playerUsername ?? "Player";
+            shooter = __instance.playerHeldBy?.playerUsername ?? "Player";
         } else {
-            blame = "Accident";
+            shooter = "Accident";
         }
 
         // simulate a shot to see if we need to trigger a kill
-        bool heldByPlayer = __instance.isHeld && __instance.playerHeldBy == KillPatch.Player;
-        float dist = Vector3.Distance(KillPatch.Player.transform.position, __instance.shotgunRayPoint.transform.position);
-        Vector3 vector = KillPatch.Player.playerCollider.ClosestPoint(shotgunPosition);
+        bool heldByPlayer = __instance.isHeld && __instance.playerHeldBy == Player.Local;
+        float dist = Vector3.Distance(Player.Local.transform.position, __instance.shotgunRayPoint.transform.position);
+        Vector3 vector = Player.Local.playerCollider.ClosestPoint(shotgunPosition);
         
         bool hit = !heldByPlayer;
         hit &= !Physics.Linecast(shotgunPosition, vector, StartOfRound.Instance.collidersAndRoomMaskAndDefault, QueryTriggerInteraction.Ignore);
@@ -42,8 +37,7 @@ internal class ShotgunPatch {
         }
 
         if(hit) {
-            KillPatch.Damage(TranslatedCauseOfDeath.Shot, blame, damageNumber);
+            PlayerState.Local.Damage(ExtendedCauseOfDeath.Shot, shooter, damageNumber);
         }
     }
 }
-

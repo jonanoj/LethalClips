@@ -4,45 +4,51 @@ using HarmonyLib;
 namespace LethalClips.Patches;
 
 
-[HarmonyPatch()]
-internal class AnimationPatch {
-
-    [HarmonyPatch(typeof(FlowermanAI), "killAnimation")]
+[HarmonyPatch]
+public static class AnimationPatch {
+    [HarmonyPatch(typeof(FlowermanAI), nameof(FlowermanAI.killAnimation))]
     [HarmonyPrefix]
-    private static void Bracken() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Strangled, "Bracken", -1);
+    public static void Bracken(FlowermanAI __instance) {
+        var player = PlayerState.Of(__instance.inSpecialAnimationWithPlayer);
+        player.Kill(ExtendedCauseOfDeath.Strangled, "Bracken", -1);
     }
 
-    [HarmonyPatch(typeof(MouthDogAI), "KillPlayer")]
+    [HarmonyPatch(typeof(MouthDogAI), nameof(MouthDogAI.KillPlayer))]
     [HarmonyPrefix]
-    private static void EyelessDog() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Mauled, "Eyeless Dog", -1);
+    public static void EyelessDog(int playerId) {
+        var player = PlayerState.Of(Player.FromID(playerId));
+        player.Kill(ExtendedCauseOfDeath.Mauled, "Eyeless Dog", -1);
     }
 
-
-    [HarmonyPatch(typeof(ForestGiantAI), "EatPlayerAnimation")]
+    [HarmonyPatch(typeof(ForestGiantAI), nameof(ForestGiantAI.EatPlayerAnimation))]
     [HarmonyPrefix]
-    private static void ForestKeeper() {
+    public static void ForestKeeper(PlayerControllerB playerBeingEaten) {
         // it's pretty common to escape the animation, so don't hard-claim death
         // TODO: try to hook into these animations a little more closely to claim death only when about to die
-        KillPatch.Kill(TranslatedCauseOfDeath.Devoured, "ForestKeeper", 6);
+        var player = PlayerState.Of(playerBeingEaten);
+        player.Kill(ExtendedCauseOfDeath.Devoured, "Forest Keeper", 6);
     }
 
-    [HarmonyPatch(typeof(JesterAI), "killPlayerAnimation")]
+    [HarmonyPatch(typeof(JesterAI), nameof(JesterAI.killPlayerAnimation))]
     [HarmonyPrefix]
-    private static void Jester() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Mauled, "Jester", -1);
+    public static void Jester(int playerId) {
+        var player = PlayerState.Of(Player.FromID(playerId));
+        player.Kill(ExtendedCauseOfDeath.Mauled, "Jester", -1);
     }
 
-    [HarmonyPatch(typeof(MaskedPlayerEnemy), "killAnimation")]
+    [HarmonyPatch(typeof(MaskedPlayerEnemy), nameof(MaskedPlayerEnemy.killAnimation))]
     [HarmonyPrefix]
-    private static void Masked(MaskedPlayerEnemy __instance) {
-        KillPatch.Kill(TranslatedCauseOfDeath.Infected, __instance.mimickingPlayer?.playerUsername ?? "Masked", 5);
+    public static void Masked(MaskedPlayerEnemy __instance) {
+        // see comment on giant
+        var player = PlayerState.Of(__instance.inSpecialAnimationWithPlayer);
+        player.Kill(ExtendedCauseOfDeath.Infected, __instance.mimickingPlayer?.playerUsername ?? "Masked", 5);
     }
 
-    [HarmonyPatch(typeof(RadMechAI), "TorchPlayerAnimation")]
+    [HarmonyPatch(typeof(RadMechAI), nameof(RadMechAI.TorchPlayerAnimation))]
     [HarmonyPrefix]
-    private static void OldBird() {
-        KillPatch.Kill(TranslatedCauseOfDeath.Incinerated, "Old Bird", 7);
+    public static void OldBird(RadMechAI __instance) {
+        // see comment on giant
+        var player = PlayerState.Of(__instance.inSpecialAnimationWithPlayer);
+        player.Kill(ExtendedCauseOfDeath.Incinerated, "Old Bird", 7);
     }
 }

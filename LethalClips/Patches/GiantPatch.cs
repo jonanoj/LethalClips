@@ -4,14 +4,12 @@ using UnityEngine;
 
 namespace LethalClips.Patches;
 
-using P = ForestGiantAI;
 
-
-[HarmonyPatch(typeof(P), nameof(P.AnimationEventA))]
-internal class GiantPatch {
-    private static void Prefix(
-        P __instance
-    ) {
+[HarmonyPatch(typeof(ForestGiantAI))]
+public class GiantPatch {
+    [HarmonyPatch(nameof(ForestGiantAI.AnimationEventA))]
+    [HarmonyPrefix]
+    public static void AnimationEventA(ForestGiantAI __instance) {
         // crush players upon whom the giant falls
         RaycastHit[] array = Physics.SphereCastAll(
             __instance.deathFallPosition.position,
@@ -22,10 +20,8 @@ internal class GiantPatch {
             QueryTriggerInteraction.Ignore
         );
         for(int i = 0; i < array.Length; i++) {
-            PlayerControllerB player = array[i].transform.GetComponent<PlayerControllerB>();
-            if(player == KillPatch.Player) {
-                KillPatch.Kill(TranslatedCauseOfDeath.Crushed, "Forest Keeper");
-            }
+            var player = array[i].transform.GetState<PlayerControllerB, PlayerState>();
+            player.Damage(ExtendedCauseOfDeath.Crushed, "Forest Keeper", 30);
         }
     }
 }

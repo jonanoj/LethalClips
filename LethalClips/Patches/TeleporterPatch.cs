@@ -1,105 +1,36 @@
-using System;
-using GameNetcodeStuff;
 using HarmonyLib;
-using LethalClips;
-using Steamworks;
-using P = ShipTeleporter;
+using System.Collections;
 
-internal enum TeleporterType
-{
-    Unknown = 0,
-    Normal = 1,
-    Inverse = 2,
-}
+namespace LethalClips.Patches;
 
 
-[HarmonyPatch(typeof(P), "SetPlayerTeleporterId")]
-internal class TeleporterPatch
-{
-    internal static PlayerControllerB Player => GameNetworkManager.Instance.localPlayerController;
+[HarmonyPatch(typeof(ShipTeleporter))]
+public class TeleporterPatch {
+    [HarmonyPatch(nameof(ShipTeleporter.beamUpPlayer))]
+    [HarmonyPostfix]
+    public static void BeamUpPlayer(ref IEnumerator __result) {
+        // since the original function is a coroutine, we need to wrap the output to properly postfix
+        var original = __result;
+        __result = Wrapper();
 
-    internal static int LastTeleporterId { get; private set; } = -1;
-    internal static DateTime LastTeleportEventTime { get; private set; } = DateTime.MinValue;
+        IEnumerator Wrapper() {
+            // save this before the coroutine runs
+            var player = StartOfRound.Instance.mapScreen.targetedPlayer;
 
-    private static void Prefix(
-       P __instance,
-       PlayerControllerB playerScript,
-       int teleporterId)
-    {
-        if (Player != playerScript)
-        {
-            // Another player was teleported
-            return;
-        }
+            yield return original;
 
-        if (teleporterId == LastTeleporterId)
-        {
-            // Either:
-            // 1. Player missed the inverse teleporter, ignore
-            // 2. Inverse teleport is loading (it constantly fires calls with ID 2 until teleported)
-            return;
-        }
-
-        if (teleporterId == -1 && LastTeleporterId != -1)
-        {
-            // Player teleported!
-            TeleporterType teleporterType = (TeleporterType)LastTeleporterId;
-            if (!Enum.IsDefined(typeof(TeleporterType), teleporterType))
-            {
-                teleporterType = TeleporterType.Unknown;
+            if(Config.Clips.Teleporter.Value && player == Player.Local) {
+                var description = $"{(player.isPlayerDead ? "Yoink" : "Sav")}ed by the teleporter";
+                Steam.AddEvent("Teleported", description, Steam.Icon.Transfer);
             }
-
-            CreateTeleportEvent(teleporterType);
-        }
-
-        // Save the last used teleporter ID
-        LastTeleporterId = teleporterId;
-    }
-
-    private static void CreateTeleportEvent(TeleporterType teleporterType)
-    {
-        if (DateTime.UtcNow - LastTeleportEventTime < TimeSpan.FromSeconds(1))
-        {
-            // Inverse teleporter fires 2 events
-            Plugin.Log.LogDebug("Duplicate teleport event, ignoring");
-            return;
-        }
-
-        LastTeleportEventTime = DateTime.UtcNow;
-
-        var description = $"Teleported by {teleporterType} teleporter";
-        Plugin.Log.LogDebug(description);
-
-        if (!Plugin.ClipConfig.ClipTeleporter.Value)
-        {
-            return;
-        }
-
-        try
-        {
-            var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                GetTimelineMessage(teleporterType),
-                description,
-                "steam_transfer",
-                0,
-                0,
-                TimelineEventClipPriority.Standard
-            );
-            Plugin.Log.LogDebug($"Added timeline event {timelineEvent}.");
-        }
-        catch (Exception e)
-        {
-            Plugin.Log.LogError($"Failed to add timeline event: {e}");
         }
     }
 
-    private static string GetTimelineMessage(TeleporterType teleporterType)
-    {
-        return teleporterType switch
-        {
-            TeleporterType.Normal => Player.isPlayerDead ? "Saved" : "Yoinked",
-            TeleporterType.Inverse => "Inversed",
-            _ => "Teleported" // Unknown teleporter type
-        };
+    [HarmonyPatch(nameof(ShipTeleporter.TeleportPlayerOutWithInverseTeleporter))]
+    [HarmonyPostfix]
+    public static void TeleportPlayerOutWithInverseTeleporter(int playerObj) {
+        if(Config.Clips.Teleporter.Value && Player.FromID(playerObj) == Player.Local) {
+            Steam.AddEvent("Teleported", "Inverse teleported into the facility", Steam.Icon.Transfer);
+        }
     }
 }

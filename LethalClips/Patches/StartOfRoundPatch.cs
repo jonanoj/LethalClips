@@ -1,67 +1,24 @@
-using System;
 using HarmonyLib;
-using LethalClips;
-using Steamworks;
+
+namespace LethalClips.Patches;
+
 
 [HarmonyPatch(typeof(StartOfRound))]
-internal class StartOfRoundPatch
-{
+public class StartOfRoundPatch {
     [HarmonyPatch(nameof(StartOfRound.openingDoorsSequence))]
     [HarmonyPrefix]
-    private static void OpeningDoorsSequence()
-    {
-        Plugin.Log.LogDebug("OpeningDoorsSequence called");
-
-        if (!Plugin.ClipConfig.ClipRound.Value)
-        {
-            return;
-        }
-
-        // TODO: consider using the SetTimelineGameMode API instead
-        try
-        {
-            var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                "Ship has landed",
-                "Round start",
-                "steam_flag",
-                0,
-                0,
-                TimelineEventClipPriority.Standard
-            );
-            Plugin.Log.LogDebug($"Added timeline event {timelineEvent}.");
-        }
-        catch (Exception e)
-        {
-            Plugin.Log.LogError($"Failed to add timeline event: {e}");
+    public static void OpeningDoorsSequence() {
+        // TODO: make this a game phase
+        if(Config.Clips.Rounds.Value) {
+            Steam.AddEvent("Round start", "The ship has landed", Steam.Icon.Flag);
         }
     }
 
     [HarmonyPatch(nameof(StartOfRound.ShipHasLeft))]
     [HarmonyPrefix]
-    private static void ShipHasLeft()
-    {
-        Plugin.Log.LogDebug("ShipHasLeft called");
-
-        if (!Plugin.ClipConfig.ClipRound.Value)
-        {
-            return;
-        }
-
-        try
-        {
-            var timelineEvent = SteamTimeline.AddInstantaneousTimelineEvent(
-                "Ship has left",
-                "Round ended",
-                "steam_completed",
-                0,
-                0,
-                TimelineEventClipPriority.Standard
-            );
-            Plugin.Log.LogDebug($"Added timeline event {timelineEvent}.");
-        }
-        catch (Exception e)
-        {
-            Plugin.Log.LogError($"Failed to add timeline event: {e}");
+    public static void ShipHasLeft() {
+        if(Config.Clips.Rounds.Value) {
+            Steam.AddEvent("Round end", "The ship has left", Steam.Icon.Completed);
         }
     }
 }
