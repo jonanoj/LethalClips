@@ -8,6 +8,7 @@ public class StartOfRoundPatch {
     [HarmonyPatch(nameof(StartOfRound.openingDoorsSequence))]
     [HarmonyPrefix]
     public static void OpeningDoorsSequence() {
+        // TODO: make this a game phase
         if(Config.Clips.Rounds.Value) {
             Steam.AddEvent("Round start", "The ship has landed", Steam.Icon.Flag);
         }

@@ -38,7 +38,7 @@ public class PlayerState : State<PlayerControllerB, PlayerState> {
     }
 
     public void Damage(ExtendedCauseOfDeath cause, string source, float damage) {
-        if(Instance.health <= damage && (damage > 50 || Instance.criticallyInjured)) {
+        if(Instance.health <= damage && (damage >= 50 || Instance.criticallyInjured)) {
             Kill(cause, source);
         }
     }
@@ -46,7 +46,7 @@ public class PlayerState : State<PlayerControllerB, PlayerState> {
     public void TriggerDeathEvent(CauseOfDeath causeOfDeath) {
         if(0 <= DeathTimeout && DeathTimeout < Time.time) {
             // the cached cause of death has expired, so use the vanilla values
-            this.CauseOfDeath = (ExtendedCauseOfDeath)causeOfDeath;
+            CauseOfDeath = (ExtendedCauseOfDeath)causeOfDeath;
             SourceOfDeath = "";
         }
 
